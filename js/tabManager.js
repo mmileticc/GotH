@@ -86,41 +86,88 @@ export class TabManager {
   }
 
   // Renderovanje
-  refresh() {
-    this.guitarDiv.innerHTML = '';
-    const openLabels = this.tuning.map(note => note.padEnd(4, ' ') + '|');
+  // refresh() {
+  //   this.guitarDiv.innerHTML = '';
+  //   const openLabels = this.tuning.map(note => note.padEnd(4, ' ') + '|');
 
-    // grupisanje po stringovima
-    const lines = Array(this.tuning.length).fill('').map((_, i) => openLabels[i]);
+  //   // grupisanje po stringovima
+  //   const lines = Array(this.tuning.length).fill('').map((_, i) => openLabels[i]);
 
+  //   this.notes.forEach(note => {
+  //     for (let i = 0; i < lines.length; i++) {
+  //       if (i === note.string) {
+  //         const isSelected = (note.position === this.selectedIndex);
+  //         const cssClass = isSelected ? 'tab-note selected' : 'tab-note';
+  //         // lines[i] += `<span class="${cssClass}" data-pos="${note.position}">${note.fret.toString().padStart(3,'-')}</span>-`;
+
+  //         // napravi span element
+  //         const span = `<span class="${cssClass}" data-pos="${note.position}">${note.fret}</span>`;
+  //         lines[i] += span;
+
+  //       } else {
+  //         // lines[i] += '---' + '-';
+  //         lines[i] += `<span class="tab-note no-hower">-</span>`;
+
+  //       }
+  //     }
+  //   });
+
+  //   lines.forEach(line => {
+  //     const pre = document.createElement('pre');
+  //     pre.innerHTML = line;
+  //     this.guitarDiv.append(pre);
+  //   });
+
+  //   // dodaj klik listenere na note
+  //   this.guitarDiv.querySelectorAll('.tab-note').forEach(el => {
+  //     el.addEventListener('click', () => {
+  //       const pos = parseInt(el.dataset.pos, 10);
+  //       this.selectNoteByPosition(pos);
+  //     });
+  //   });
+  //   this.refreshHarmonicaTabs();
+
+  // }
+refresh() {
+  this.guitarDiv.innerHTML = '';
+  const openLabels = this.tuning.map(note => note.padEnd(4, ' ') + '|');
+
+  this.tuning.forEach((_, stringIndex) => {
+    const pre = document.createElement('pre');
+    pre.style.fontFamily = 'monospace';
+
+    // dodaj labelu za otvorenu žicu
+    pre.append(document.createTextNode(openLabels[stringIndex]));
+
+    // prođi kroz sve note
     this.notes.forEach(note => {
-      for (let i = 0; i < lines.length; i++) {
-        if (i === note.string) {
-          const isSelected = (note.position === this.selectedIndex);
-          const cssClass = isSelected ? 'tab-note selected' : 'tab-note';
-          lines[i] += `<span class="${cssClass}" data-pos="${note.position}">${note.fret.toString().padStart(2,'-')}</span>-`;
-        } else {
-          lines[i] += '--' + '-';
-        }
+      if (note.string === stringIndex) {
+        const span = document.createElement('span');
+        span.className = (note.position === this.selectedIndex) ? 'tab-note selected' : 'tab-note';
+        span.dataset.pos = note.position;
+        span.textContent = note.fret;
+
+        // listener za selekciju
+        span.addEventListener('click', () => {
+          this.selectNoteByPosition(note.position);
+        });
+
+        pre.append(span);
+      } else {
+        const empty = document.createElement('span');
+        empty.classList.add('tab-note', 'no-hover')
+        empty.textContent = '-';
+        pre.append(empty);
       }
     });
 
-    lines.forEach(line => {
-      const pre = document.createElement('pre');
-      pre.innerHTML = line;
-      this.guitarDiv.append(pre);
-    });
+    this.guitarDiv.append(pre);
+  });
 
-    // dodaj klik listenere na note
-    this.guitarDiv.querySelectorAll('.tab-note').forEach(el => {
-      el.addEventListener('click', () => {
-        const pos = parseInt(el.dataset.pos, 10);
-        this.selectNoteByPosition(pos);
-      });
-    });
-    this.refreshHarmonicaTabs();
+  this.refreshHarmonicaTabs();
+}
 
-  }
+
 
   // slusa dogadjaje sa fretboarda
   listen() {

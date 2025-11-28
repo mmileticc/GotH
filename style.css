@@ -129,7 +129,8 @@ tr td {
 /* Disabled varijante */
 .fret-mahogany-disabled,
 .fret-maple-disabled,
-.fret-ebony-disabled {
+.fret-ebony-disabled,
+.no-hover {
   pointer-events: none;   /* onemogućava klik i hover */
   cursor: default;        /* nema "ruku" kad pređeš mišem */
   transition: none;       /* nema animacije */
@@ -164,11 +165,18 @@ tr td {
 .tab-note {
   padding: 2px 4px;
   border-radius: 4px;
+  min-width: 30px;          /* fiksna širina za svaku notu */
+  text-align: center;   /* centriraj broj */
   transition: background-color 0.2s ease;
+
+  display: inline-block;
+  font-family: monospace; 
+
 }
 .tab-note:hover {
   font-weight: bold;
 }
+
 /* .tab-note.selected {
   background-color: #ffeb3b;
   border: 1px solid #f44336;
