@@ -86,85 +86,72 @@ export class TabManager {
   }
 
   // Renderovanje
-  // refresh() {
-  //   this.guitarDiv.innerHTML = '';
-  //   const openLabels = this.tuning.map(note => note.padEnd(4, ' ') + '|');
-
-  //   // grupisanje po stringovima
-  //   const lines = Array(this.tuning.length).fill('').map((_, i) => openLabels[i]);
-
-  //   this.notes.forEach(note => {
-  //     for (let i = 0; i < lines.length; i++) {
-  //       if (i === note.string) {
-  //         const isSelected = (note.position === this.selectedIndex);
-  //         const cssClass = isSelected ? 'tab-note selected' : 'tab-note';
-  //         // lines[i] += `<span class="${cssClass}" data-pos="${note.position}">${note.fret.toString().padStart(3,'-')}</span>-`;
-
-  //         // napravi span element
-  //         const span = `<span class="${cssClass}" data-pos="${note.position}">${note.fret}</span>`;
-  //         lines[i] += span;
-
-  //       } else {
-  //         // lines[i] += '---' + '-';
-  //         lines[i] += `<span class="tab-note no-hower">-</span>`;
-
-  //       }
-  //     }
-  //   });
-
-  //   lines.forEach(line => {
-  //     const pre = document.createElement('pre');
-  //     pre.innerHTML = line;
-  //     this.guitarDiv.append(pre);
-  //   });
-
-  //   // dodaj klik listenere na note
-  //   this.guitarDiv.querySelectorAll('.tab-note').forEach(el => {
-  //     el.addEventListener('click', () => {
-  //       const pos = parseInt(el.dataset.pos, 10);
-  //       this.selectNoteByPosition(pos);
-  //     });
-  //   });
-  //   this.refreshHarmonicaTabs();
-
-  // }
+  
 refresh() {
+  const scrollPos = this.guitarDiv.scrollTop; // zapamti poziciju
+
   this.guitarDiv.innerHTML = '';
-  const openLabels = this.tuning.map(note => note.padEnd(4, ' ') + '|');
 
-  this.tuning.forEach((_, stringIndex) => {
-    const pre = document.createElement('pre');
-    pre.style.fontFamily = 'monospace';
+  const container = document.createElement('div');
+  container.id = 'guitarTabs';
 
-    // dodaj labelu za otvorenu žicu
-    pre.append(document.createTextNode(openLabels[stringIndex]));
+  // širina diva i širina jedne note
+  const divWidth = this.guitarDiv.clientWidth;
+  const noteWidth = 32; // 30px + gap
+  let notesPerBlock = Math.max(1, Math.floor(divWidth / noteWidth)) - 2;
+  notesPerBlock = notesPerBlock < 1? 1: notesPerBlock;
 
-    // prođi kroz sve note
-    this.notes.forEach(note => {
-      if (note.string === stringIndex) {
+
+  //const notesPerBlock = 20; // koliko nota po measure-u
+  const totalBlocks = Math.ceil(this.notes.length / notesPerBlock) || 1;
+
+  for (let blockIndex = 0; blockIndex < totalBlocks; blockIndex++) {
+    const measure = document.createElement('div');
+    measure.classList.add('measure');
+
+    this.tuning.forEach((openNote, stringIndex) => {
+      const stringRow = document.createElement('div');
+      stringRow.classList.add('guitar-string');
+
+      // labela otvorene žice
+      const label = document.createElement('span');
+      label.textContent = openNote.padEnd(4, ' ') + '|';
+      stringRow.append(label);
+
+      // note za ovaj blok
+      const start = blockIndex * notesPerBlock;
+      const end = start + notesPerBlock;
+      const blockNotes = this.notes.slice(start, end);
+
+      blockNotes.forEach(note => {
         const span = document.createElement('span');
-        span.className = (note.position === this.selectedIndex) ? 'tab-note selected' : 'tab-note';
-        span.dataset.pos = note.position;
-        span.textContent = note.fret;
+        if (note.string === stringIndex) {
+          span.className = (note.position === this.selectedIndex) ? 'tab-note selected' : 'tab-note';
+          span.dataset.pos = note.position;
+          span.textContent = note.fret;
+          span.addEventListener('click', () => this.selectNoteByPosition(note.position));
+        } else {
+          span.classList.add('tab-note', 'no-hover');
+          span.textContent = '-';
+        }
+        stringRow.append(span);
+      });
 
-        // listener za selekciju
-        span.addEventListener('click', () => {
-          this.selectNoteByPosition(note.position);
-        });
-
-        pre.append(span);
-      } else {
-        const empty = document.createElement('span');
-        empty.classList.add('tab-note', 'no-hover')
-        empty.textContent = '-';
-        pre.append(empty);
-      }
+      measure.append(stringRow);
     });
 
-    this.guitarDiv.append(pre);
+    container.append(measure);
+  }
+
+  this.guitarDiv.append(container);
+  this.refreshHarmonicaTabs();
+  
+  
+  requestAnimationFrame(() => {
+    this.guitarDiv.scrollTop = scrollPos;
   });
 
-  this.refreshHarmonicaTabs();
+
 }
 
 
@@ -273,6 +260,8 @@ refresh() {
         }
       }
     });
+
+    window.addEventListener('resize', () => this.refresh());
   }
 
 
