@@ -263,6 +263,21 @@ refresh() {
     });
 
     window.addEventListener('resize', () => this.refresh());
+
+
+
+    document.getElementById("btnSaveText").addEventListener("click", () => {
+      const modal = new bootstrap.Modal(document.getElementById("saveModal"));
+      modal.show();
+    });
+
+    document.getElementById("btnSaveGuitar").addEventListener("click", () => {
+      this.saveAsText("guitar+harmonica");
+    });
+
+    document.getElementById("btnSaveHarmonica").addEventListener("click", () => {
+      this.saveAsText("harmonica-only");
+    });
   }
 
 
@@ -294,6 +309,7 @@ refresh() {
   });
 
   
+  
 }
 
 
@@ -315,6 +331,74 @@ selectNoteByPosition(pos) {
   if (hEl) {
     hEl.classList.add('selected');
   }
+}
+
+
+saveAsText(type = "guitar+harmonica") {
+  let lines = [];
+
+  // harmonika: redovi sa tabovima
+  let harmonicaLine = '';
+  this.notes.forEach((n, i) => {
+    const playable = this.harmonica.getPlayableNotes().findLast(h => h.note === n.note);
+    if (playable) {
+      harmonicaLine += playable.tab.toString();
+    } else {
+      harmonicaLine +='no';
+    }
+    harmonicaLine += " ";
+    if((i+1) % 10 == 0) harmonicaLine += "\n";
+  });
+  
+  if (type !== "harmonica-only") {
+    lines.push(this.guitarTabsTxt(100));
+  } 
+  lines.push('\nHarmonica tabs: \n');
+  lines.push(harmonicaLine);
+
+  const text = lines.join('\n');
+
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = (type === "harmonica-only" ? "harmonicaTabs.txt" : "guitarTabs.txt");
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+
+// gitara: 6 redova sa razbijanjem na blokove
+guitarTabsTxt(num = 60) {
+  let lines = [];
+
+  // napravi 6 stringova (po žici)
+  let stringRows = this.tuning.map(openNote => openNote.padEnd(3, ' ') + '|');
+
+  // dodaj note u svaki string
+  this.notes.forEach(note => {
+    this.tuning.forEach((openNote, stringIndex) => {
+      if (note.string === stringIndex) {
+        stringRows[stringIndex] += note.fret.toString().padStart(3, '-');
+      } else {
+        stringRows[stringIndex] += '---';
+      }
+    });
+  });
+
+  // sada razbij svaku žicu u blokove po num karaktera
+  const maxLen = Math.max(...stringRows.map(r => r.length));
+  for (let start = 0; start < maxLen; start += num) {
+    this.tuning.forEach((openNote, stringIndex) => {
+      const row = stringRows[stringIndex].slice(start, start + num);
+      lines.push(row);
+    });
+    lines.push(''); // prazna linija između blokova
+  }
+
+  return lines.join('\n');
 }
 
 }
