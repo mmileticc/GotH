@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://mmileticc.github.io/GuitarToHarmonicaTabMaker/sitemap.xml
