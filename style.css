@@ -321,3 +321,126 @@ tr td {
   font-weight: bold;
 }
 
+
+/* Mobile Navbar Styles */
+@media (max-width: 991px) {
+  .navbar-collapse {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .navbar-collapse .d-flex {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .navbar-collapse .btn-group,
+  .navbar-collapse #settingsToggle {
+    width: 100%;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .btn-group .btn {
+    border-radius: 0.375rem !important;
+    text-align: center;
+  }
+
+  .navbar .dropdown-menu {
+    position: static !important;
+    float: none;
+    width: 100% !important;
+    margin-top: 0.5rem;
+    margin-left: 0 !important;
+    border: none;
+    box-shadow: none;
+    background-color: rgba(33, 37, 41, 0.95);
+    display: none;
+  }
+
+  .navbar .dropdown-menu.show {
+    display: block !important;
+  }
+
+  .navbar .dropdown-menu .dropdown-item {
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+  }
+
+  .navbar .dropdown-menu .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+}
+
+/* Dropdown menu styling za sve uređaje */
+.navbar .btn-group {
+  position: relative;
+}
+
+.navbar .dropdown-menu {
+  min-width: 150px;
+  border-radius: 0.375rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar .dropdown-item {
+  transition: background-color 0.2s ease;
+  padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-item.active,
+.navbar .dropdown-item:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Tablet and larger screens */
+@media (min-width: 992px) {
+  .navbar-collapse .d-flex {
+    flex-direction: row !important;
+    align-items: center !important;
+    width: auto !important;
+    justify-content: flex-end;
+  }
+
+  .navbar-collapse .btn-group,
+  .navbar-collapse #settingsToggle {
+    width: auto !important;
+  }
+
+  .btn-group .btn {
+    text-align: right;
+    border-radius: 0.375rem !important;
+  }
+
+  .navbar .dropdown-menu {
+    position: absolute !important;
+    right: 0;
+    left: auto !important;
+    margin-top: 0.5rem;
+    background-color: rgba(33, 37, 41, 0.98);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: 200px;
+    min-width: 150px;
+    overflow-y: auto;
+    max-height: calc(100vh - 80px);
+  }
+
+  .navbar .dropdown-item {
+    color: #fff;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    white-space: nowrap;
+  }
+
+  .navbar .dropdown-item:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+}
+
