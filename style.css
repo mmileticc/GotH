@@ -1,18 +1,73 @@
-
 /* Globalni stil */
 body {
-  background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+  background: linear-gradient(135deg, #ffffff, #f8f9ff);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #222;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Tipografija headinga */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+h1 {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(120deg, #1f2937, #374151);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 3px solid #4b2e2e;
+  padding-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1rem;
+}
+
+h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.lead {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #4b5563;
 }
 
 /* Logo stil */
 .logo-text {
   font-family: 'Audiowide', cursive;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
   color: #fff;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover .logo-text {
+  text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transform: scale(1.05);
 }
 
 h2 {
@@ -23,12 +78,39 @@ h2 {
   padding-bottom: 0.3rem;
 }
 
+/* Kartice i elementi */
+.card {
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.75rem;
+}
+
+.card-text {
+  font-family: 'Segoe UI', sans-serif;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
 /* Fretboard tabela */
 table {
   border-collapse: collapse;
   margin: 10px auto;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  border-radius: 6px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -408,11 +490,20 @@ tr td {
 }
 
 .mahogany-circle {
-  background-color: var(--mahogany-main) !important;
+  background: linear-gradient(135deg, #4b2e2e, #6b3f3f);
   color: #fff !important;
-  width: 50px; 
-  height: 50px; 
+  width: 60px; 
+  height: 60px; 
   font-size: 24px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 15px rgba(75, 46, 46, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mahogany-circle:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 8px 25px rgba(75, 46, 46, 0.4);
 }
 .mahogany-bg {
   background-color: var(--mahogany-main) !important;
@@ -464,5 +555,51 @@ tr td {
     background-color: rgba(255, 255, 255, 0.15);
     color: #fff;
   }
+}
+
+/* Sekcije sa modernizacijom */
+.bg-light {
+  background: linear-gradient(135deg, #f8fafb, #f0f4f8) !important;
+}
+
+section {
+  transition: all 0.3s ease;
+}
+
+section h2 {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Dugmići sa poboljšanom stilizacijom */
+.btn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  border-radius: 8px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.btn-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.1rem;
+}
+
+/* Poboljšana navigacijska traka */
+.navbar {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+/* Footer stil */
+footer {
+  background: linear-gradient(135deg, #ffffff, #f8f9ff);
 }
 
