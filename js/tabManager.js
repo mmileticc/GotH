@@ -27,7 +27,7 @@ export class TabManager {
       const saved = localStorage.getItem('goth_notes');
       if (saved) {
         const parsed = JSON.parse(saved);
-        this.notes = parsed.map((n, i) => new TabNote(n.string, n.fret, i, n.note));
+        this.notes = parsed//.map((n, i) => new TabNote(n.string, n.fret, i, n.note));
       }
     } catch (e) {
       console.warn('Greška pri učitavanju nota iz localStorage:', e);
@@ -38,7 +38,7 @@ export class TabManager {
   // Sačuvaj note u localStorage
   saveNotes() {
     try {
-      const toSave = this.notes.map(n => ({ string: n.string, fret: n.fret, note: n.note }));
+      const toSave = this.notes//.map(n => ({ string: n.string, fret: n.fret, note: n.note }));
       localStorage.setItem('goth_notes', JSON.stringify(toSave));
     } catch (e) {
       console.warn('Greška pri čuvanju nota u localStorage:', e);

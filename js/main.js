@@ -3,6 +3,20 @@ import { TabManager } from './tabManager.js';
 import { NoteSystem } from './noteSystem.js';
 import { Fretboard } from './fretboard.js';
 
+// Pomoćna funkcija za promenu boje
+function lightenColor(hex, percent) {
+  hex = hex.replace(/^#/, '');
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+  r = Math.min(255, Math.floor(r + (255 - r) * percent));
+  g = Math.min(255, Math.floor(g + (255 - g) * percent));
+  b = Math.min(255, Math.floor(b + (255 - b) * percent));
+  return "#" + r.toString(16).padStart(2, '0')
+             + g.toString(16).padStart(2, '0')
+             + b.toString(16).padStart(2, '0');
+}
+
 class AppController {
   constructor() {
     this.noteSystem = new NoteSystem();
@@ -22,8 +36,45 @@ class AppController {
     );
 
     this.initListeners();
+    this.loadTheme(); // učitaj sačuvanu temu
     this.fretboard.render();
-    this.tabs.refresh();
+    setTimeout(() => this.tabs.refresh(), 0);
+  }
+
+  loadTheme() {
+    const savedTheme = localStorage.getItem('goth_fret_theme') || 'mahogany';
+    const themeSelect = document.getElementById('fretTheme');
+    const colorPicker = document.getElementById('customColor');
+
+    themeSelect.value = savedTheme;
+
+    if (savedTheme === 'custom') {
+      const customColor = localStorage.getItem('goth_fret_custom_color') || '#4b2e2e';
+      colorPicker.value = customColor;
+      colorPicker.style.display = 'inline';
+      this.fretboard.setTheme('custom', customColor);
+      
+      // Postavi CSS varijable
+      document.documentElement.style.setProperty('--custom-main', customColor);
+      document.documentElement.style.setProperty('--custom-accent', lightenColor(customColor, 0.3));
+    } else {
+      colorPicker.style.display = 'none';
+      this.fretboard.setTheme(savedTheme);
+    }
+
+    // Postavi button klase
+    const buttons = document.querySelectorAll('.btn-theme');
+    buttons.forEach(btn => {
+      btn.classList.remove('btn-mahogany', 'btn-maple', 'btn-ebony', 'btn-custom');
+      btn.classList.add(`btn-${savedTheme}`);
+    });
+  }
+
+  saveTheme(theme, customColor = null) {
+    localStorage.setItem('goth_fret_theme', theme);
+    if (customColor) {
+      localStorage.setItem('goth_fret_custom_color', customColor);
+    }
   }
 
   initListeners() {
@@ -72,9 +123,11 @@ class AppController {
 
         document.documentElement.style.setProperty('--custom-main', colorPicker.value);
         document.documentElement.style.setProperty('--custom-accent', lightenColor(colorPicker.value, 0.3));
+        this.saveTheme('custom', colorPicker.value);
       } else {
         colorPicker.style.display = 'none';
         this.fretboard.setTheme(e.target.value);
+        this.saveTheme(e.target.value);
       }
     });
 
@@ -83,6 +136,7 @@ class AppController {
 
       document.documentElement.style.setProperty('--custom-main', e.target.value);
       document.documentElement.style.setProperty('--custom-accent', lightenColor(e.target.value, 0.3));
+      this.saveTheme('custom', e.target.value);
     });
 
     // advanced mode toggle (bends / overblows)
@@ -162,4 +216,32 @@ class AppController {
 // Initialize AppController only if the necessary DOM elements exist (on editor pages)
 if (document.getElementById("fretboard") && document.getElementById("guitarTabs")) {
   new AppController();
+}
+
+// Dark mode toggle
+function initDarkMode() {
+  const themeToggle = document.getElementById('themeToggle');
+  if (!themeToggle) return;
+
+  // Učitaj sačuvanu temu
+  const savedTheme = localStorage.getItem('goth_site_theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+  }
+
+  // Toggle event
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('goth_site_theme', isDark ? 'dark' : 'light');
+    themeToggle.textContent = isDark ? '☀️' : '🌙';
+  });
+}
+
+// Inicijalizuj dark mode pri učitavanju
+document.addEventListener('DOMContentLoaded', initDarkMode);
+// Ili ako je skripti defer
+if (document.readyState !== 'loading') {
+  initDarkMode();
 }

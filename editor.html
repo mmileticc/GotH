@@ -25,6 +25,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous" defer></script>
     <script type="module" src="js/main.js" defer></script>
     <script src="js/i18n.js" defer></script>
+    
+    <!-- Dark mode script (inline za brzu primenu) -->
+    <script>
+      (function() {
+        // Čeka se malo da DOM bude spreman
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', applyTheme);
+        } else {
+          applyTheme();
+        }
+        
+        function applyTheme() {
+          const savedTheme = localStorage.getItem('goth_site_theme') || 'light';
+          if (savedTheme === 'dark' && document.body) {
+            document.body.classList.add('dark-mode');
+          }
+        }
+      })();
+    </script>
 
 </head>
 <body class="container-fluid">
@@ -44,6 +63,7 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="d-flex align-items-center flex-column flex-lg-row gap-2 gap-lg-0 w-100 ms-lg-auto">
                     <a href="index.html" class="btn btn-outline-light me-2" data-i18n="back_btn">← Nazad</a>
+                    <button id="themeToggle" class="btn btn-outline-light me-2" type="button" title="Tamna/Svetla tema">🌙</button>
                     <div class="btn-group me-lg-2 w-100 w-lg-auto">
                         <button id="langBtn" type="button" class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">EN</button>
                         <ul class="dropdown-menu">
@@ -268,5 +288,32 @@
             <small data-i18n="footer_text">© 2025 GotH - Milinko | v1.0</small>
         </footer>
     </div>
+    
+    <script>
+      // Dark mode toggle initialization
+      function initDarkMode() {
+        const themeToggle = document.getElementById('themeToggle');
+        if (!themeToggle) return;
+
+        // Postavi inicijalni icon
+        const isDark = document.body.classList.contains('dark-mode');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+
+        // Toggle event
+        themeToggle.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+          const isDark = document.body.classList.contains('dark-mode');
+          localStorage.setItem('goth_site_theme', isDark ? 'dark' : 'light');
+          themeToggle.textContent = isDark ? '☀️' : '🌙';
+        });
+      }
+
+      // Inicijalizuj dark mode
+      if (document.readyState !== 'loading') {
+        initDarkMode();
+      } else {
+        document.addEventListener('DOMContentLoaded', initDarkMode);
+      }
+    </script>
 </body>
 </html>
