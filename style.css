@@ -6,6 +6,15 @@ body {
   color: #222;
 }
 
+/* Logo stil */
+.logo-text {
+  font-family: 'Audiowide', cursive;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
 h2 {
   margin-top: 1rem;
   margin-bottom: 1rem;

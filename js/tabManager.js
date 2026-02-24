@@ -16,8 +16,54 @@ export class TabManager {
     this.mode = 'editFromFretboard'; // 'append' | 'editFromFretboard' | 'insertAfter'
     this.editTarget = 'string+fret'; // ili 'fret-only' ako želiš da zadržiš isti string
 
-
+    this.loadNotes(); // učitaj note iz localStorage
+    this.loadMode(); // učitaj mode iz localStorage
     this.listen();
+  }
+
+  // Učitaj note iz localStorage
+  loadNotes() {
+    try {
+      const saved = localStorage.getItem('goth_notes');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        this.notes = parsed.map((n, i) => new TabNote(n.string, n.fret, i, n.note));
+      }
+    } catch (e) {
+      console.warn('Greška pri učitavanju nota iz localStorage:', e);
+      this.notes = [];
+    }
+  }
+
+  // Sačuvaj note u localStorage
+  saveNotes() {
+    try {
+      const toSave = this.notes.map(n => ({ string: n.string, fret: n.fret, note: n.note }));
+      localStorage.setItem('goth_notes', JSON.stringify(toSave));
+    } catch (e) {
+      console.warn('Greška pri čuvanju nota u localStorage:', e);
+    }
+  }
+
+  // Učitaj mode iz localStorage
+  loadMode() {
+    try {
+      const saved = localStorage.getItem('goth_mode');
+      if (saved && (saved === 'editFromFretboard' || saved === 'insertAfter')) {
+        this.mode = saved;
+      }
+    } catch (e) {
+      console.warn('Greška pri učitavanju mode iz localStorage:', e);
+    }
+  }
+
+  // Sačuvaj mode u localStorage
+  saveMode() {
+    try {
+      localStorage.setItem('goth_mode', this.mode);
+    } catch (e) {
+      console.warn('Greška pri čuvanju mode u localStorage:', e);
+    }
   }
 
   // ➕ Insert na određenu poziciju
@@ -29,6 +75,7 @@ export class TabManager {
   this.notes.forEach((n, i) => n.position = i);
 
   this.refresh();
+  this.saveNotes(); // sačuvaj promene
   //this.refreshHarmonicaTabs();
 }
   
@@ -37,6 +84,7 @@ export class TabManager {
   deleteNote(position) {
     this.notes = this.notes.filter(n => n.position !== position);
     this.refresh();
+    this.saveNotes(); // sačuvaj promene
   }
 
   // Editovanje note po poziciji
@@ -58,6 +106,7 @@ export class TabManager {
 
 
       this.refresh();
+      this.saveNotes(); // sačuvaj promene
     }
   }
 
@@ -66,6 +115,7 @@ export class TabManager {
     this.notes = [];
     this.selectedIndex = null;
     this.refresh();
+    this.saveNotes(); // sačuvaj promene
   }
 
   // Brisanje selektovane note

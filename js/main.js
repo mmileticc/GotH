@@ -116,7 +116,16 @@ class AppController {
     const modeSwitch = document.getElementById('modeSwitch');
     const modeLabel = document.getElementById('modeLabel');
 
-   const lang1 = localStorage.getItem('goth_lang') || 'sr';
+   //const lang1 = localStorage.getItem('goth_lang') || 'sr';
+
+    // postavi inicijalno stanje modeSwitch na osnovu učitanog mode
+    modeSwitch.checked = this.tabs.mode === 'insertAfter';
+    if (modeSwitch.checked) {
+      modeLabel.setAttribute('data-i18n', 'mode_insert');
+    } else {
+      modeLabel.setAttribute('data-i18n', 'mode_edit');
+    }
+    //I18N.setChosen(lang1);
 
     modeSwitch.addEventListener('change', () => {
       if (modeSwitch.checked) {
@@ -128,6 +137,7 @@ class AppController {
         modeLabel.removeAttribute('data-i18n');
         modeLabel.setAttribute('data-i18n', 'mode_edit');
       }
+      this.tabs.saveMode(); // sačuvaj mode
       I18N.setChosen(localStorage.getItem('goth_lang') || 'en');
 
     });
