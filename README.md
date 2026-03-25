@@ -3,7 +3,7 @@
 **GOTH** is a lightweight web tool designed for multi-instrumentalists who play both guitar and harmonica. 
 It solves the tedious task of manually transposing guitar tabs into harmonica-friendly tablature.
 
-[ Try the Live Demo here!](https://milinkomiletic.github.io/GOTH/)
+[ Try the Live Demo here!](https://mmileticc.github.io/GotH/)
 
 ## The "GOTH" Logic (Naming Convention)
 If **Java** can be named after coffee and **Python** after a British comedy troupe, this project follows the fine tradition of questionable naming conventions in software engineering.
