@@ -1,10 +1,11 @@
 {
-  "_title": "GotH - Guitar to Harmonica Transposer",
-  "_description": "GotH — Convert guitar tablature to harmonica tabs online. Free, supports multiple keys and reed counts.",
+  "_title": "Guitar to Harmonica | Free Tab Converter",
+  "_description": "GotH - The ultimate guitar to harmonica converter. Convert tabs online for free.",
   "nav_brand": "GotH",
   "hero_h1": "Guitar to Harmonica",
-  "hero_subtitle": "Convert guitar tabs to harmonica tabs in seconds",
-  "hero_desc": "GotH is a free, fast and simple tool that helps you convert guitar tablature to harmonica. It includes advanced options for different types of harmonicas.",
+  "hero_subtitle": "Free Guitar to Harmonica Converter",
+  "hero_desc": "GotH is a fast, simple and free tool to convert guitar tablature to harmonica tabs instantly.",
+  
   "editor_btn": "Open Editor →",
   "features_title": "Key Features",
   "feature_1_title": "Instant Conversion",
