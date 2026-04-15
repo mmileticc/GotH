@@ -23,11 +23,5 @@
     }
   ],
   "categories": ["music", "education", "productivity"],
-  "screenshots": [
-    {
-      "src": "/GotH/img/icon.jpg",
-      "sizes": "540x720",
-      "type": "image/jpeg"
-    }
-  ]
+  "screenshots": []
 }

@@ -17,11 +17,20 @@
     <meta property="og:image" content="https://mmileticc.github.io/GotH/img/icon-512.png">
     <meta property="og:url" content="https://mmileticc.github.io/GotH/en/about.html">
     <meta property="og:site_name" content="GotH">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="sr_RS">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="About – GotH">
+    <meta name="twitter:description" content="Learn more about the GotH project and how you can contribute.">
+    <meta name="twitter:image" content="https://mmileticc.github.io/GotH/img/icon-512.png">
 
     <!-- Canonical -->
     <link rel="canonical" href="https://mmileticc.github.io/GotH/en/about.html">
     <link rel="alternate" href="https://mmileticc.github.io/GotH/about.html" hreflang="sr">
     <link rel="alternate" href="https://mmileticc.github.io/GotH/en/about.html" hreflang="en">
+    <link rel="alternate" href="https://mmileticc.github.io/GotH/en/about.html" hreflang="x-default">
 
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="../img/favicon.ico">
@@ -30,6 +39,8 @@
 
     <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../customButtons.css">
@@ -53,6 +64,18 @@
         }
       })();
     </script>
+    <!-- Structured data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://mmileticc.github.io/GotH/en/"},
+        {"@type": "ListItem", "position": 2, "name": "About", "item": "https://mmileticc.github.io/GotH/en/about.html"}
+      ]
+    }
+    </script>
+
 </head>
 <body class="container-fluid">
     <div id="main">
@@ -114,6 +137,7 @@
             </section>
 
             <!-- Status -->
+            <section class="about-section mb-4">
                 <p>GotH is currently in beta. Core features are stable, but optimizations, expanded harmonica type support, and UI improvements are still in progress. Every piece of feedback directly shapes development.</p>
 
                 <h3 class="mt-4">Planned Features</h3>

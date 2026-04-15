@@ -10,6 +10,28 @@
     <meta name="author" content="Milinko Miletic">
     <meta name="robots" content="index, follow">
 
+    <!-- Open Graph (sr) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="GotH Editor - Pretvarač tablatura">
+    <meta property="og:description" content="Radi sa gitarskim i harmonika tabovima u realnom vremenu.">
+    <meta property="og:image" content="https://mmileticc.github.io/GotH/img/icon-512.png">
+    <meta property="og:url" content="https://mmileticc.github.io/GotH/editor.html">
+    <meta property="og:site_name" content="GotH">
+    <meta property="og:locale" content="sr_RS">
+    <meta property="og:locale:alternate" content="en_US">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GotH Editor - Pretvarač tablatura">
+    <meta name="twitter:description" content="Radi sa gitarskim i harmonika tabovima u realnom vremenu.">
+    <meta name="twitter:image" content="https://mmileticc.github.io/GotH/img/icon-512.png">
+
+    <!-- Canonical & Hreflang -->
+    <link rel="canonical" href="https://mmileticc.github.io/GotH/editor.html">
+    <link rel="alternate" href="https://mmileticc.github.io/GotH/editor.html" hreflang="sr">
+    <link rel="alternate" href="https://mmileticc.github.io/GotH/en/editor.html" hreflang="en">
+    <link rel="alternate" href="https://mmileticc.github.io/GotH/editor.html" hreflang="x-default">
+
     <!-- Favicon & PWA -->
     <link rel="icon" type="image/x-icon" href="https://mmileticc.github.io/GotH/img/favicon.ico">
     <link rel="apple-touch-icon" href="https://mmileticc.github.io/GotH/img/icon-192.png">
@@ -17,6 +39,8 @@
 
     <!-- css -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="customButtons.css">
@@ -25,6 +49,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous" defer></script>
     <script type="module" src="js/main.js" defer></script>
     <script src="js/i18n.js" defer></script>
+
+    <!-- Structured data: Breadcrumbs -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Početna", "item": "https://mmileticc.github.io/GotH/"},
+        {"@type": "ListItem", "position": 2, "name": "Editor", "item": "https://mmileticc.github.io/GotH/editor.html"}
+      ]
+    }
+    </script>
     
     <!-- Dark mode script (inline za brzu primenu) -->
     <script>
