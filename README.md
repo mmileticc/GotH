@@ -1,36 +1,34 @@
-# 🎸 GOTH (Guitar to Harmonica) 🎶
+# GotH — Guitar to Harmonica | Free Tab Converter
 
-**GOTH** is a lightweight web tool designed for multi-instrumentalists who play both guitar and harmonica. 
-It solves the tedious task of manually transposing guitar tabs into harmonica-friendly tablature.
+Free, browser-based tool that converts guitar tablature (frets) to harmonica tabs (blow/draw) in real time.
 
-[ Try the Live Demo here!](https://mmileticc.github.io/GotH/)
+➡️ Live site: https://mmileticc.github.io/GotH/
 
-## The "GOTH" Logic (Naming Convention)
+## Name
+While "GTOH" would be the logical acronym, **GotH** (Guitar to Harmonica) is short, memorable, and fits the app’s dark-mode vibe.
 If **Java** can be named after coffee and **Python** after a British comedy troupe, this project follows the fine tradition of questionable naming conventions in software engineering.
-
-While "GTOH" would be the logical acronym, **GOTH** sounds cooler, is easier to remember, and—let's be honest — programmers love a good dark mode. 
 
 
 ## The Problem
-Many songs have iconic guitar riffs that sound amazing on a harmonica, but guitar tabs (expressed in frets) and harmonica tabs (expressed in blow/draw holes) speak two different languages. **GOTH** bridges that gap instantly.
+Guitar tabs (frets) and harmonica tabs (blow/draw holes) are two different notations. **GotH** bridges that gap instantly.
 
 ## Features
-- **Instant Conversion:** Paste your guitar tabs and get the corresponding harmonica holes.
-- **Key Customization:** Supports different harmonica keys (C, G, A, etc.) to match the song's tonality.
-- **Smart Mapping:** Accounts for the Diatonic harmonica's unique layout (Blow/Draw/Bends).
-- **Clean UI:** Simple, distraction-free interface built for quick use during practice sessions.
+- **Instant conversion** — paste guitar tabs and get harmonica holes.
+- **Key selection** — choose harmonica key (C, G, A, …).
+- **Smart mapping** — considers diatonic layout (blow/draw/bends).
+- **Clean UI** — fast, distraction‑free practice tool.
 
 ## Tech Stack
 - **Frontend:** HTML5, CSS3, JavaScript (ES6+), Bootstrap
-- **Logic:** Custom mapping algorithm for musical intervals and harmonica reed layouts.
-- **Hosting:** GitHub Pages.
+- **Logic:** Custom mapping algorithm for musical intervals and harmonica reed layouts
+- **Hosting:** GitHub Pages
 
 ## Behind the Project
-The name **GOTH** stands for *Guitar to Harmonica*. The project was born out of a personal need to quickly adapt blues and folk riffs without spending hours on music theory manuals. 
+The project was born out of a personal need to quickly adapt blues and folk riffs without spending hours on music theory manuals.
 
 
 ##  How to Use
-1. **Just use it.** Input the frets, pick a key, and hit convert. If you can't figure it out, maybe stick to the triangle. 🔺
+1. Open the app → paste or type frets → pick harmonica key → Convert.
 
 ---
 **Developed by:** Milinko Miletić  
