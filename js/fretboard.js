@@ -1,3 +1,4 @@
+import { lightenColor } from './colorUtils.js';
 
 export class Fretboard {
   constructor(container, tuning, noteSystem, harmonica) {
@@ -29,10 +30,6 @@ export class Fretboard {
   const notesHarmonica = this.harmonica.getPlayableNotes();
 
   this.tuning.forEach((noteFull, stringIndex) => {
-    const octave = parseInt(noteFull.slice(-1), 10);
-    const noteName = noteFull.slice(0, -1);
-    const rootIndex = this.noteSystem.findIndex(noteName);
-
     const stringRow = document.createElement('tr');
 
     for (let fret = 0; fret <= this.numOfFrets; fret++) {
@@ -49,14 +46,8 @@ export class Fretboard {
       //cell.classList.add("fretField");
       if (fret === 0) cell.classList.add('zeroFret');
 
-      let idx = (rootIndex + fret) % this.noteSystem.notes.length;
-      let octaveDiff = Math.floor((rootIndex + fret) / this.noteSystem.notes.length);
-      let fullNote = this.noteSystem.notes[idx] + (octave + octaveDiff);
-
-      let searchNote = fullNote;
-      if (!this.noteSystem.isSharp) {
-        searchNote = this.noteSystem.notesSharp[idx] + (octave + octaveDiff);
-      }
+      const fullNote = this.noteSystem.getFullNote(noteFull, fret);
+      const searchNote = this.noteSystem.getSharpNote(noteFull, fret);
 
       cell.textContent = fullNote;
 
@@ -121,25 +112,4 @@ export class Fretboard {
     this.numOfFrets = n;
     this.render();
   }
-}
-
-
-function lightenColor(hex, percent) {
-  // skini # ako postoji
-  hex = hex.replace(/^#/, '');
-
-  // parsiraj u R, G, B
-  let r = parseInt(hex.substring(0,2), 16);
-  let g = parseInt(hex.substring(2,4), 16);
-  let b = parseInt(hex.substring(4,6), 16);
-
-  // pomeri svaku komponentu ka 255 (belo)
-  r = Math.min(255, Math.floor(r + (255 - r) * percent));
-  g = Math.min(255, Math.floor(g + (255 - g) * percent));
-  b = Math.min(255, Math.floor(b + (255 - b) * percent));
-
-  // vrati nazad kao hex string
-  return "#" + r.toString(16).padStart(2,'0')
-             + g.toString(16).padStart(2,'0')
-             + b.toString(16).padStart(2,'0');
 }

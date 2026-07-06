@@ -1,4 +1,5 @@
 import { TabNote } from './tabNote.js';
+import { parseGuitarTab } from './tabParser.js';
 
 export class TabManager {
   constructor(guitarDiv, harmonicaDiv, harmonica, tuning, fretboard) {
@@ -27,7 +28,11 @@ export class TabManager {
       const saved = localStorage.getItem('goth_notes');
       if (saved) {
         const parsed = JSON.parse(saved);
-        this.notes = parsed//.map((n, i) => new TabNote(n.string, n.fret, i, n.note));
+        this.notes = Array.isArray(parsed)
+          ? parsed
+              .filter(n => n && Number.isInteger(n.string) && Number.isInteger(n.fret))
+              .map((n, i) => new TabNote(n.string, n.fret, i, n.note))
+          : [];
       }
     } catch (e) {
       console.warn('Greška pri učitavanju nota iz localStorage:', e);
@@ -95,13 +100,7 @@ export class TabManager {
 
       // izračunaj novi pitch
       const openNote = this.tuning[note.string]; // npr. "E4"
-      const octave = parseInt(openNote.slice(-1), 10);
-      const noteName = openNote.slice(0, -1);
-      const rootIndex = this.fretboard.noteSystem.findIndex(noteName);
-
-      let idx = (rootIndex + newFret) % this.fretboard.noteSystem.notes.length;
-      let octaveDiff = Math.floor((rootIndex + newFret) / this.fretboard.noteSystem.notes.length);
-      note.note = this.fretboard.noteSystem.notes[idx] + (octave + octaveDiff);
+      note.note = this.fretboard.noteSystem.getFullNote(openNote, newFret);
 
 
 
@@ -116,6 +115,14 @@ export class TabManager {
     this.selectedIndex = null;
     this.refresh();
     this.saveNotes(); // sačuvaj promene
+  }
+
+  // Zamenjuje ceo tab uvezenim notama (paste-import)
+  loadParsedNotes(newNotes) {
+    this.notes = newNotes;
+    this.selectedIndex = null;
+    this.refresh();
+    this.saveNotes();
   }
 
   // Brisanje selektovane note
@@ -145,11 +152,13 @@ refresh() {
   // const container = document.createElement('div');
   // container.id = 'guitarTabs';
 
-  // širina diva i širina jedne note
+  // širina diva, labele (žica) i jedne note (mora pratiti CSS: .tab-note flex-basis, .guitar-string gap)
+  const isMobile = window.matchMedia('(max-width: 576px)').matches;
   const divWidth = this.guitarDiv.clientWidth;
-  const noteWidth = 34; // 30px + gap
-  let notesPerBlock = Math.max(1, Math.floor(divWidth / noteWidth)) - 1;
-  notesPerBlock = notesPerBlock < 1? 1: notesPerBlock;
+  const labelWidth = 40; // vidi label.style.minWidth niže
+  const noteWidth = isMobile ? 24 : 30; // mora pratiti .tab-note flex-basis na istom breakpointu (576px) u style.css
+  const gap = 2;
+  const notesPerBlock = Math.max(1, Math.floor((divWidth - labelWidth - gap) / (noteWidth + gap)));
 
 
   //const notesPerBlock = 20; // koliko nota po measure-u
@@ -233,13 +242,7 @@ refresh() {
           n.fret = fret;
           // ažuriraj pitch na osnovu originalnog stringa + novog praga
           const openNote = this.tuning[n.string];
-          const octave = parseInt(openNote.slice(-1), 10);
-          const noteName = openNote.slice(0, -1);
-          const rootIndex = this.fretboard.noteSystem.findIndex(noteName);
-
-          const idx = (rootIndex + fret) % this.fretboard.noteSystem.notes.length;
-          const octaveDiff = Math.floor((rootIndex + fret) / this.fretboard.noteSystem.notes.length);
-          n.note = this.fretboard.noteSystem.notes[idx] + (octave + octaveDiff);
+          n.note = this.fretboard.noteSystem.getFullNote(openNote, fret);
         }
 
         this.refresh();
@@ -327,6 +330,20 @@ refresh() {
 
     document.getElementById("btnSaveHarmonica").addEventListener("click", () => {
       this.saveAsText("harmonica-only");
+    });
+
+    document.getElementById("btnConfirmPaste").addEventListener("click", () => {
+      const text = document.getElementById("pasteTabInput").value;
+      const errEl = document.getElementById("pasteTabError");
+      try {
+        const parsed = parseGuitarTab(text, this.tuning, this.fretboard.noteSystem);
+        this.loadParsedNotes(parsed);
+        errEl.classList.add("d-none");
+        bootstrap.Modal.getInstance(document.getElementById("pasteModal")).hide();
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.classList.remove("d-none");
+      }
     });
   }
 

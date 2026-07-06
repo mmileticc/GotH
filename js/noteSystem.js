@@ -16,4 +16,22 @@ export class NoteSystem {
     if(note.includes('#')) return this.notesSharp.indexOf(note);
     return this.notes.indexOf(note);
   }
+
+  _computeIndexOctave(openNote, fret) {
+    const octave = parseInt(openNote.slice(-1), 10);
+    const rootIndex = this.findIndex(openNote.slice(0, -1));
+    const idx = (rootIndex + fret) % this.notesSharp.length;
+    const octaveDiff = Math.floor((rootIndex + fret) / this.notesSharp.length);
+    return { idx, octave: octave + octaveDiff };
+  }
+
+  getFullNote(openNote, fret) {
+    const { idx, octave } = this._computeIndexOctave(openNote, fret);
+    return this.notes[idx] + octave;
+  }
+
+  getSharpNote(openNote, fret) {
+    const { idx, octave } = this._computeIndexOctave(openNote, fret);
+    return this.notesSharp[idx] + octave;
+  }
 }

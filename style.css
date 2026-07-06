@@ -66,6 +66,11 @@ h2 {
   padding-bottom: 0.75rem;
 }
 
+@media (max-width: 576px) {
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.75rem; }
+}
+
 h3 {
   font-size: 1.75rem;
   font-weight: 600;
@@ -167,6 +172,11 @@ tr td {
   transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.3s ease;
 }
 
+@media (max-width: 576px) {
+  tr td { min-width: 32px; width: 28px; height: 26px; font-size: 0.75rem; }
+  .numeration { font-size: 0.75rem; }
+}
+
 body.dark-mode tr td {
   border-color: #555;
 }
@@ -210,31 +220,6 @@ body.dark-mode tr td {
   color: #555; */
    background-color: #a58b6f; /* boja starog drveta */
   color: #333;
-}
-
-/*  */
-/* Mahagoni */
-.fret-mahogany {
-  background-color: #4b2e2e;
-  color: #f5f5dc;
-}
-.fret-mahogany:hover {
-  background-color: #6b3f3f;
-  color: #fff;
-  font-weight: bold;
-    transform: scale(1.05);
-}
-
-/* Javor */
-.fret-maple {
-  background-color: #d2b48c;
-  color: #222;
-}
-.fret-maple:hover {
-  background-color: #deb887;
-  color: #000;
-  font-weight: bold;
-    transform: scale(1.05);
 }
 
 /* 🎸 Mahogany – tamno crveno drvo */
@@ -295,14 +280,13 @@ body.dark-mode tr td {
 
 .numeration {
   border: none;
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary);
   color: #333;
   font-size: 0.9rem;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark-mode .numeration {
-  background-color: #2a2a2a;
   color: #b0b0b0;
 }
 
@@ -334,15 +318,15 @@ body.dark-mode .zeroFret {
 #guitarTabs {
   display: flex;
   flex-direction: column;   /* blokovi jedan ispod drugog */
-  gap: 12px;                
+  gap: 12px;
   font-family: monospace;
   overflow-y: scroll;
-  overflow-x: none;
+  overflow-x: hidden;
 
   height: 320px;
 
-  background: #fafafa;  
-  border: 1px solid #ddd;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   /* padding: 10px; */
   border-radius: 6px;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
@@ -365,6 +349,10 @@ body.dark-mode .zeroFret {
   text-align: center;
   color: #333;
   transition: color 0.2s ease;
+}
+
+@media (max-width: 576px) {
+  .tab-note { flex-basis: 24px; min-width: 24px; font-size: 0.8rem; }
 }
 
 .tab-note.no-hover {
@@ -392,14 +380,14 @@ body.dark-mode .zeroFret {
 
 
   font-family: monospace;
-  background: #fafafa;
-  border: 1px solid #ddd;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   padding: 10px;
   border-radius: 6px;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 
   overflow-y: scroll;
-  overflow-x: none;
+  overflow-x: hidden;
 
   height: 320px;
 }
@@ -883,8 +871,6 @@ body.dark-mode .control-panel label {
 /* Dark mode - tabovi */
 body.dark-mode #guitarTabs,
 body.dark-mode #harmonicaTabs {
-  background: #2a2a2a;
-  border-color: #444;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 

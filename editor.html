@@ -211,6 +211,7 @@
 
 
                 <h3 data-i18n="fretboard_h3">Fretboard</h3>
+                <small class="text-muted d-md-none" data-i18n="fretboard_scroll_hint">↔ skroluj</small>
                 <div id="fretboard" class="row overflow-auto "></div>
             
 
@@ -220,22 +221,26 @@
                         <div id="guitarTabs" class="m-3"></div>
 
                         <div id="tabControls" class="my-3 d-flex gap-2 align-items-center">
-                            <button id="btnToggleMode" class="btn btn-theme btn-mahogany" >
+                            <button id="btnToggleMode" class="btn btn-outline-secondary" >
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="modeSwitch">
                                 <label class="form-check-label" for="modeSwitch" id="modeLabel"> Edit Selected</label>
                             </div>
                             </button>
-                            
-                            
 
-                            <button id="btnDelete" class="btn btn-theme btn-mahogany" data-i18n="delete_button">
+
+
+                            <button id="btnDelete" class="btn btn-outline-secondary" data-i18n="delete_button">
                             Obriši selektovanu
                             </button>
 
-                            <button id="btnClear" class="btn btn-theme btn-mahogany" data-bs-toggle="modal" data-bs-target="#clearModal" data-i18n="clear_button">
+                            <button id="btnClear" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#clearModal" data-i18n="clear_button">
                             Očisti sve
                             </button>
+
+                            <!-- <button id="btnPasteTab" class="btn btn-theme btn-mahogany" data-bs-toggle="modal" data-bs-target="#pasteModal" data-i18n="paste_button">
+                            Nalepi tab
+                            </button> -->
                         </div>
 
                         <!-- Modal potvrde -->
@@ -252,6 +257,27 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="modal_cancel">Odustani</button>
                                     <button type="button" class="btn btn-danger" id="confirmClear" data-i18n="confirm_clear_button">Obriši sve</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal za paste-import -->
+                        <div class="modal fade" id="pasteModal" tabindex="-1" aria-labelledby="pasteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="pasteModalLabel" data-i18n="paste_modal_title">Nalepi gitarski tab</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p data-i18n="paste_modal_p">Nalepi standardni 6-linijski gitarski tab (e/B/G/D/A/E). Ovo će zameniti trenutnu tablaturu.</p>
+                                    <textarea id="pasteTabInput" rows="8" class="form-control" placeholder="e|--3--5--7--|&#10;B|------------|&#10;G|------------|&#10;D|------------|&#10;A|------------|&#10;E|--0--2--3--|"></textarea>
+                                    <div id="pasteTabError" class="text-danger mt-2 d-none"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="modal_cancel">Odustani</button>
+                                    <button type="button" class="btn btn-primary" id="btnConfirmPaste" data-i18n="paste_confirm_button">Uvezi</button>
                                 </div>
                                 </div>
                             </div>
@@ -328,32 +354,5 @@
             <small data-i18n="footer_text">© 2025 GotH - Milinko | v1.1</small>
         </footer>
     </div>
-    
-    <script>
-      // Dark mode toggle initialization
-      function initDarkMode() {
-        const themeToggle = document.getElementById('themeToggle');
-        if (!themeToggle) return;
-
-        // Postavi inicijalni icon
-        const isDark = document.body.classList.contains('dark-mode');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-
-        // Toggle event
-        themeToggle.addEventListener('click', () => {
-          document.body.classList.toggle('dark-mode');
-          const isDark = document.body.classList.contains('dark-mode');
-          localStorage.setItem('goth_site_theme', isDark ? 'dark' : 'light');
-          themeToggle.textContent = isDark ? '☀️' : '🌙';
-        });
-      }
-
-      // Inicijalizuj dark mode
-      if (document.readyState !== 'loading') {
-        initDarkMode();
-      } else {
-        document.addEventListener('DOMContentLoaded', initDarkMode);
-      }
-    </script>
 </body>
 </html>
