@@ -192,4 +192,27 @@ function onStop() {
   overflow-x: auto;
   min-height: 120px;
 }
+
+/*
+ * alphaTab ubacuje kursor/highlight elemente direktno u DOM (mimo Vue
+ * template-a), pa im obična scoped pravila ne "vide" klase — otud :deep().
+ * Sami elementi nemaju nijednu boju/pozadinu podešenu iz JS-a, oslanjaju se
+ * potpuno na spoljašnji CSS (bez ovoga kursor postoji ali je nevidljiv).
+ */
+.alphatab-surface :deep(.at-cursor-bar) {
+  background: rgba(255, 200, 0, 0.25);
+}
+
+.alphatab-surface :deep(.at-cursor-beat) {
+  background: #d9534f;
+}
+
+.alphatab-surface :deep(.at-selection div) {
+  background: rgba(64, 64, 255, 0.1);
+}
+
+.alphatab-surface :deep(.at-highlight) * {
+  fill: #d9534f !important;
+  stroke: #d9534f !important;
+}
 </style>
