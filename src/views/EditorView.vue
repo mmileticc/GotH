@@ -79,23 +79,23 @@ function setDuration(d: NoteDuration) {
 
             <button
               class="btn btn-outline-secondary"
-              title="Undo (Ctrl+Z)"
+              :title="$t('undo_title')"
               :disabled="!store.canUndo"
               @click="store.undo()"
             >
-              ↶ Undo
+              ↶ {{ $t('undo_button') }}
             </button>
             <button
               class="btn btn-outline-secondary"
-              title="Redo (Ctrl+Y)"
+              :title="$t('redo_title')"
               :disabled="!store.canRedo"
               @click="store.redo()"
             >
-              ↷ Redo
+              ↷ {{ $t('redo_button') }}
             </button>
 
             <div v-if="selectedNote" class="d-flex align-items-center gap-1 ms-2">
-              <span class="text-muted small me-1">Trajanje:</span>
+              <span class="text-muted small me-1">{{ $t('duration_label') }}</span>
               <button
                 v-for="d in DURATIONS"
                 :key="d.value"
@@ -124,7 +124,7 @@ function setDuration(d: NoteDuration) {
       </div>
 
       <div id="notation" class="my-4">
-        <h3>Notni zapis i reprodukcija</h3>
+        <h3>{{ $t('notation_playback_h3') }}</h3>
         <AlphaTabPlayer />
       </div>
 

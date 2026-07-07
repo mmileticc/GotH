@@ -93,8 +93,10 @@ function computeTsPrefixes(bars: TabNoteData[][]): string[] {
 }
 
 /**
- * Generiše alphaTex izvor za trenutni tab: jedna traka za gitaru (standardna
- * notacija + tab zajedno, stvarni štim korisnika, GM instrument
+ * Generiše alphaTex izvor za trenutni tab: jedna traka za gitaru (samo
+ * standardna notacija — bez tab-a, jer je tab već prikazan u GuitarTabView
+ * iznad pa bi ponavljanje u alphaTab prikazu bilo suvišno; stvarni štim
+ * korisnika i dalje se koristi za tačnu visinu tona, GM instrument
  * "AcousticGuitarSteel" da zvuk zaista liči na gitaru umesto default GM
  * instrumenta) i jedna traka za harmoniku (standardna notacija, GM
  * instrument "Harmonica"), sa istim ritmom preuzetim iz note.duration polja.
@@ -142,7 +144,7 @@ export function buildAlphaTex(notes: TabNoteData[], tuning: string[], harmonicaK
     '\\track "Gitara"',
     `\\instrument "${GUITAR_INSTRUMENT}"`,
     `\\tuning (${tuningStr})`,
-    '\\staff {score tabs}',
+    '\\staff {score}',
     guitarBars.join(' | '),
     `\\track "${harmonicaLabel}"`,
     `\\instrument "${HARMONICA_INSTRUMENT}"`,

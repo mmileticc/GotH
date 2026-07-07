@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import * as alphaTab from '@coderline/alphatab'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildAlphaTex } from '@/lib/alphaTex'
+
+const { t } = useI18n()
 
 // @coderline/alphatab-vite plugin kopira font/soundfont fajlove u build
 // output i servira ih na `<root>/soundfont/` i `<root>/font/`. Koristimo
@@ -155,20 +158,20 @@ function onStop() {
         :disabled="!isReady"
         @click="onPlayPause"
       >
-        {{ isPlaying ? '⏸ Pauza' : '▶ Sviraj' }}
+        {{ isPlaying ? $t('alphatab_pause') : $t('alphatab_play') }}
       </button>
       <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="!isReady" @click="onStop">
-        ⏹ Stop
+        {{ $t('alphatab_stop') }}
       </button>
 
-      <div class="btn-group btn-group-sm ms-1" role="group" aria-label="Izbor trake za reprodukciju">
+      <div class="btn-group btn-group-sm ms-1" role="group" :aria-label="t('alphatab_track_aria')">
         <button
           type="button"
           class="btn"
           :class="playbackTrack === 'guitar' ? 'btn-secondary' : 'btn-outline-secondary'"
           @click="playbackTrack = 'guitar'"
         >
-          🎸 Gitara
+          {{ $t('alphatab_track_guitar') }}
         </button>
         <button
           type="button"
@@ -176,12 +179,12 @@ function onStop() {
           :class="playbackTrack === 'harmonica' ? 'btn-secondary' : 'btn-outline-secondary'"
           @click="playbackTrack = 'harmonica'"
         >
-          🎵 Harmonika
+          {{ $t('alphatab_track_harmonica') }}
         </button>
       </div>
 
-      <span v-if="!isReady" class="text-muted small">Učitavanje sound fonta…</span>
-      <span v-if="loadError" class="text-danger small">Greška: {{ loadError }}</span>
+      <span v-if="!isReady" class="text-muted small">{{ $t('alphatab_loading') }}</span>
+      <span v-if="loadError" class="text-danger small">{{ $t('alphatab_error_prefix') }}{{ loadError }}</span>
     </div>
     <div ref="container" class="alphatab-surface"></div>
   </div>
@@ -191,6 +194,12 @@ function onStop() {
 .alphatab-surface {
   overflow-x: auto;
   min-height: 120px;
+  /* Notacija se crta kao tamna nota-glava/linije na pretpostavljeno svetloj
+     pozadini — u dark mode-u bi bez ovoga bila skoro nevidljiva na tamnoj
+     pozadini stranice, pa notni zapis uvek drži svetlu "papirnu" podlogu. */
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 0.5rem;
 }
 
 /*

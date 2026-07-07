@@ -172,17 +172,17 @@ function onStringOctaveChange(index: number, newOctave: number) {
             </div>
 
             <div class="col-md-5">
-              <label for="tuningPreset" class="form-label fw-bold">Štimovanje gitare</label>
+              <label for="tuningPreset" class="form-label fw-bold">{{ $t('tuning_label') }}</label>
               <select id="tuningPreset" class="form-select" :value="uiPresetId" @change="onPresetChange">
                 <option v-for="p in TUNING_PRESETS" :key="p.id" :value="p.id">{{ p.label }}</option>
-                <option :value="CUSTOM_TUNING_ID">Custom</option>
+                <option :value="CUSTOM_TUNING_ID">{{ $t('opt_custom') }}</option>
               </select>
             </div>
 
             <div v-if="uiPresetId === CUSTOM_TUNING_ID" class="col-md-7">
-              <label class="form-label fw-bold mb-1">Note po žici (visoko → nisko)</label>
+              <label class="form-label fw-bold mb-1">{{ $t('tuning_custom_label') }}</label>
               <div class="tuning-string-row" v-for="(s, i) in customStrings" :key="i">
-                <span class="tuning-string-label">Žica {{ i + 1 }}</span>
+                <span class="tuning-string-label">{{ $t('tuning_string_label') }} {{ i + 1 }}</span>
                 <select
                   class="form-select form-select-sm"
                   :value="parseNoteString(s).name"
@@ -213,10 +213,10 @@ function onStringOctaveChange(index: number, newOctave: number) {
                 :value="store.harmonicaKey"
                 @change="store.setHarmonicaKey(($event.target as HTMLSelectElement).value)"
               >
-                <optgroup label="Najčešći">
+                <optgroup :label="$t('harmonica_key_common')">
                   <option v-for="k in HARMONICA_KEYS_COMMON" :key="k" :value="k">{{ k }}</option>
                 </optgroup>
-                <optgroup label="Ostali">
+                <optgroup :label="$t('harmonica_key_other')">
                   <option v-for="k in HARMONICA_KEYS_OTHER" :key="k" :value="k">{{ k }}</option>
                 </optgroup>
               </select>
