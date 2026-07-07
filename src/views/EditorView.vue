@@ -9,6 +9,7 @@ import HarmonicaTabView from '@/components/HarmonicaTabView.vue'
 import ClearConfirmModal from '@/components/ClearConfirmModal.vue'
 import LegendModal from '@/components/LegendModal.vue'
 import SaveExportModal from '@/components/SaveExportModal.vue'
+import type { NoteDuration } from '@/types/tab'
 
 const store = useEditorStore()
 useTabEditingKeyboard()
@@ -21,6 +22,22 @@ const insertMode = computed({
   get: () => store.mode === 'insertAfter',
   set: (val: boolean) => store.setMode(val ? 'insertAfter' : 'editFromFretboard'),
 })
+
+const DURATIONS: { value: NoteDuration; label: string }[] = [
+  { value: 'whole', label: '𝅝' },
+  { value: 'half', label: '𝅗𝅥' },
+  { value: 'quarter', label: '♩' },
+  { value: 'eighth', label: '♪' },
+  { value: 'sixteenth', label: '𝅘𝅥𝅯' },
+]
+
+const selectedNote = computed(() =>
+  store.selectedIndex !== null ? store.notes.find((n) => n.position === store.selectedIndex) : undefined,
+)
+
+function setDuration(d: NoteDuration) {
+  if (store.selectedIndex !== null) store.setNoteDuration(store.selectedIndex, d)
+}
 </script>
 
 <template>
@@ -39,7 +56,7 @@ const insertMode = computed({
           <h3>{{ $t('guitartabs_h3') }}</h3>
           <GuitarTabView />
 
-          <div id="tabControls" class="my-3 d-flex gap-2 align-items-center">
+          <div id="tabControls" class="my-3 d-flex gap-2 align-items-center flex-wrap">
             <button id="btnToggleMode" class="btn btn-outline-secondary">
               <div class="form-check form-switch">
                 <input id="modeSwitch" v-model="insertMode" class="form-check-input" type="checkbox" />
@@ -56,6 +73,39 @@ const insertMode = computed({
             <button id="btnClear" class="btn btn-outline-danger" @click="clearModalOpen = true">
               {{ $t('clear_button') }}
             </button>
+
+            <div class="vr mx-1"></div>
+
+            <button
+              class="btn btn-outline-secondary"
+              title="Undo (Ctrl+Z)"
+              :disabled="!store.canUndo"
+              @click="store.undo()"
+            >
+              ↶ Undo
+            </button>
+            <button
+              class="btn btn-outline-secondary"
+              title="Redo (Ctrl+Y)"
+              :disabled="!store.canRedo"
+              @click="store.redo()"
+            >
+              ↷ Redo
+            </button>
+
+            <div v-if="selectedNote" class="d-flex align-items-center gap-1 ms-2">
+              <span class="text-muted small me-1">Trajanje:</span>
+              <button
+                v-for="d in DURATIONS"
+                :key="d.value"
+                type="button"
+                class="btn btn-sm"
+                :class="selectedNote.duration === d.value ? 'btn-secondary' : 'btn-outline-secondary'"
+                @click="setDuration(d.value)"
+              >
+                {{ d.label }}
+              </button>
+            </div>
           </div>
 
           <ClearConfirmModal v-model="clearModalOpen" />

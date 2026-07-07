@@ -50,10 +50,10 @@ Cilj: identično ponašanje kao sad, samo na novom stacku.
 
 ## Faza 2 — Fundament za nove fičere
 
-- [ ] Prošireni data model: `TabNote` dobija trajanje/ritam (duration, možda i measure/beat pozicija)
-- [ ] Undo/redo: command stack u Pinia store-u (svaka izmena note je komanda)
-- [ ] Tuning sistem: preset lista (standard, drop D, DADGAD, open G/D, itd.) + slobodan izbor po žici, čuva se kao deo projekta u IndexedDB
-- [ ] Migracija sa localStorage na IndexedDB za notes/settings
+- [x] Prošireni data model: `TabNote` dobija `duration` polje (whole/half/quarter/eighth/sixteenth) — `src/types/tab.ts`
+- [x] Undo/redo: snapshot stack u `editorStore.ts` (`pushHistory`/`undo`/`redo`), Ctrl+Z/Ctrl+Y prečice + dugmići u editoru, jedan snapshot po edit-sesiji (ne po tasteru)
+- [x] Tuning sistem: 6 presetova (standard, drop D, half step down, DADGAD, open G, open D) + custom unos po žici sa validacijom — `src/lib/tunings.ts` + UI u `EditorSettingsPanel.vue`. Promena tuninga rekomputuje visinu tona postojećih nota (fret pozicije ostaju iste).
+- [x] Migracija sa localStorage na IndexedDB (`idb` biblioteka, `src/lib/db.ts`) — jednokratna migracija starih `goth_*` localStorage podataka pri prvom pokretanju
 
 ## Faza 3 — Nove funkcionalnosti (prioritet po dogovoru)
 

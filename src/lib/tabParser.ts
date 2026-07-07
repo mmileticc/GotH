@@ -80,6 +80,6 @@ export function parseGuitarTab(
   return allHits.map((hit, i) => {
     const openNote = tuning[hit.stringIndex]
     const noteName = noteSystem.getFullNote(openNote, hit.fret)
-    return { string: hit.stringIndex, fret: hit.fret, position: i, note: noteName }
+    return { string: hit.stringIndex, fret: hit.fret, position: i, note: noteName, duration: 'quarter' }
   })
 }

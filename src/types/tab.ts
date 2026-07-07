@@ -1,8 +1,11 @@
+export type NoteDuration = 'whole' | 'half' | 'quarter' | 'eighth' | 'sixteenth'
+
 export interface TabNoteData {
   string: number
   fret: number
   position: number
   note: string // npr. "C#4"
+  duration: NoteDuration
 }
 
 export type HarmonicaNoteType = 'bend' | 'overblow' | 'overdraw'
