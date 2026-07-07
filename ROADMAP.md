@@ -57,16 +57,23 @@ Cilj: identično ponašanje kao sad, samo na novom stacku.
 
 ## Faza 3 — Nove funkcionalnosti (prioritet po dogovoru)
 
-1. **Import/export overhaul** — trenutni parser je strog i lomi se na tehnikama (h/p/slide/bend); dugme za paste je zakomentarisano jer je nepouzdano. Cilj: tolerantniji parser, prepoznavanje tehnika, export u PDF/PNG/shareable link, po mogućstvu Guitar Pro/MusicXML import preko alphaTab-a ako spike iz Faze 0 uspe.
-2. **Tuning UI** — selektor sa presetovima + custom unos po žici (logika je već u Fazi 2, ovo je UI deo).
-3. **Audio playback** — reprodukcija konvertovane harmonike (i gitare) — Tone.js sintisajzer ili alphaTab soundfont ako pokrije harmoniku.
-4. **Notni zapis + ritam** — prikaz standardne notacije uz tab, na bazi proširenog data modela iz Faze 2.
+1. **Import/export overhaul** — trenutni parser je strog i lomi se na tehnikama (h/p/slide/bend); dugme za paste je zakomentarisano jer je nepouzdano. Cilj: tolerantniji parser, prepoznavanje tehnika, export u PDF/PNG/shareable link, po mogućstvu Guitar Pro/MusicXML import preko alphaTab-a.
+2. **Tuning UI** — selektor sa presetovima + custom unos po žici (logika je već u Fazi 2, ovo je UI deo). ✅ Gotovo (Faza 2/3).
+3. [x] **Audio playback + notni zapis** — alphaTab integracija:
+   - `@coderline/alphatab` + `@coderline/alphatab-vite` dodati u `package.json`/`vite.config.ts` (**korisnik treba da pokrene `npm install` da povuče nove pakete** — sandbox lockfile se ne šalje).
+   - `src/lib/alphaTex.ts` — generiše alphaTex tekst iz `store.notes`/`tuning`/`harmonicaKey`: traka "Gitara" (tab notacija, stvarni štim) + traka "Harmonika" (standardna notacija, GM instrument "Harmonica"), deljeni ritam iz `note.duration`, auto bar-splitting na 4/4. Testirano u `src/lib/__tests__/alphaTex.spec.ts` (6 testova).
+   - `src/components/AlphaTabPlayer.vue` — wrapper oko `AlphaTabApi`, render notacije/tab-a + play/pause/stop dugmići, auto-reload pri promeni nota/štima/tonaliteta.
+   - Ubačeno u `EditorView.vue` ispod gitara/harmonika prikaza.
+   - **Napomena:** ovo pokriva i tačku 4 (notni zapis + ritam) odjednom, jer alphaTab renderuje notaciju i tab zajedno sa soundfont audio-om.
+   - **Nije verifikovano vizuelno/audio-vizuelno u browseru od strane asistenta** (samo tsc/build/lint/vitest su prošli) — potrebna ručna provera od korisnika posle `npm install`.
+4. ~~Notni zapis + ritam~~ — pokriveno tačkom 3 iznad (alphaTab renderuje oboje).
 5. **Mic pitch detection** — automatsko prepoznavanje odsvirane note na gitari bez klika (Pitchy + Web Audio AnalyserNode).
 6. **Samostalni tuner** — reuse modula za pitch detection iz tačke 5, kao zaseban alat/stranica.
 7. **UI/UX redizajn editora** — kad su undo/redo, tuning i audio na mestu, preći na finalni pass nad interakcijama i mobile touch iskustvom.
 
 ## Otvoreno / za proveru usput
 
-- Da li alphaTab realno pokriva i notaciju i playback dovoljno dobro, ili treba kombinacija VexFlow (notacija) + Tone.js (audio) posebno
+- **Korisnik treba ručno da proveri u browseru** (posle `npm install`): da li se notacija ispravno renderuje, da li audio playback radi (guitar + harmonica traka), da li cursor/scroll rade kako treba tokom reprodukcije.
+- Bar-splitting u `alphaTex.ts` je pojednostavljen (greedy fill na 16 šesnaestinki po taktu, ne deli note preko granice takta) — dovoljno za prikaz/audio, ali nije muzikološki savršeno; ako zasmeta vizuelno, može se doraditi.
 - Format IndexedDB šeme za više sačuvanih projekata (trenutno postoji samo jedan aktivni tab)
 - Da li export/import .json fajla (kao "Save As" projekat) ima smisla dodati uz IndexedDB kao backup/prenosivost između uređaja, s obzirom da nema naloga

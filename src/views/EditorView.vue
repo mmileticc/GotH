@@ -6,6 +6,7 @@ import EditorSettingsPanel from '@/components/EditorSettingsPanel.vue'
 import Fretboard from '@/components/Fretboard.vue'
 import GuitarTabView from '@/components/GuitarTabView.vue'
 import HarmonicaTabView from '@/components/HarmonicaTabView.vue'
+import AlphaTabPlayer from '@/components/AlphaTabPlayer.vue'
 import ClearConfirmModal from '@/components/ClearConfirmModal.vue'
 import LegendModal from '@/components/LegendModal.vue'
 import SaveExportModal from '@/components/SaveExportModal.vue'
@@ -120,6 +121,11 @@ function setDuration(d: NoteDuration) {
         </div>
 
         <LegendModal v-model="legendModalOpen" />
+      </div>
+
+      <div id="notation" class="my-4">
+        <h3>Notni zapis i reprodukcija</h3>
+        <AlphaTabPlayer />
       </div>
 
       <div class="save">
