@@ -1,2 +1,11 @@
 favicon_io/
 .idea
+
+# Vue/Vite app
+node_modules/
+dist/
+dist-ssr/
+*.local
+coverage/
+.vite/
+*.tsbuildinfo
