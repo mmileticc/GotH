@@ -22,6 +22,36 @@ const { t } = useI18n()
 const soundFontUrl = `${import.meta.env.BASE_URL}soundfont/sonivox.sf3`
 const fontDirectoryUrl = `${import.meta.env.BASE_URL}font/`
 
+// alphaTab (web/svg render engine) na kraju svakog rendera uvek iscrtava
+// fiksni tekst "rendered by alphaTab" (hardkodovano u njihovom rendereru,
+// bez settings opcije da se isključi). MPL-2.0 licenca ne zahteva da ovaj
+// tekst ostane vidljiv korisniku, pa ga uklanjamo iz DOM-a.
+//
+// renderFinished event NIJE dovoljan za ovo: alphaTab interno registruje
+// SVG "partial"-e (registerPartial) koji se u DOM upisuju odloženo/lenjo
+// (core.enableLazyLoading je podrazumevano uključeno), pa se <text> element
+// sa ovim natpisom pojavi u DOM-u POSLE renderFinished-a i naš jednokratni
+// query ga ne bi našao. Zato koristimo MutationObserver koji kontinuirano
+// prati DOM izmene unutar kontejnera i uklanja natpis čim se pojavi, bez
+// obzira na tačan trenutak kad ga alphaTab ubaci.
+const ALPHATAB_ATTRIBUTION_TEXT = 'rendered by alphaTab'
+
+function removeAttributionText(root: HTMLElement) {
+  root.querySelectorAll('text').forEach((el) => {
+    if (el.textContent?.trim() === ALPHATAB_ATTRIBUTION_TEXT) {
+      el.remove()
+    }
+  })
+}
+
+let attributionObserver: MutationObserver | null = null
+
+function startAttributionObserver(root: HTMLElement) {
+  removeAttributionText(root)
+  attributionObserver = new MutationObserver(() => removeAttributionText(root))
+  attributionObserver.observe(root, { childList: true, subtree: true })
+}
+
 const store = useEditorStore()
 
 const container = ref<HTMLElement | null>(null)
@@ -86,6 +116,8 @@ function reload() {
 onMounted(() => {
   if (!container.value) return
 
+  startAttributionObserver(container.value)
+
   const instance = new alphaTab.AlphaTabApi(container.value, {
     core: {
       tex: false,
@@ -126,6 +158,8 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  attributionObserver?.disconnect()
+  attributionObserver = null
   api.value?.destroy()
   api.value = null
 })
