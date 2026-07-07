@@ -8,7 +8,16 @@ import { buildAlphaTex } from '@/lib/alphaTex'
 // output i servira ih na `<root>/soundfont/` i `<root>/font/`. Koristimo
 // import.meta.env.BASE_URL (a ne hardkodovanu putanju) da radi i u dev
 // modu i posle build-a sa `base: '/GotH/'` na GitHub Pages.
+//
+// Napomena: alphaTab podrazumevano pokušava da SAM pronađe font folder na
+// osnovu URL-a sopstvenog script fajla ("AlphaTabScriptFolder/font/"), ali
+// pod Vite dev serverom taj auto-detektovani URL ne odgovara stvarnoj
+// putanji na kojoj plugin servira font (isti problem kao i sa soundFont-om),
+// pa NetworkError sprečava učitavanje Bravura fonta i notacija se uopšte ne
+// iscrtava. Zato i core.fontDirectory eksplicitno postavljamo, ne samo
+// player.soundFont.
 const soundFontUrl = `${import.meta.env.BASE_URL}soundfont/sonivox.sf3`
+const fontDirectoryUrl = `${import.meta.env.BASE_URL}font/`
 
 const store = useEditorStore()
 
@@ -21,6 +30,31 @@ const loadError = ref<string | null>(null)
 // alphaTex.ts uvek generiše tačno 2 trake u ovom redosledu: [0]=Gitara, [1]=Harmonika.
 const tracks = shallowRef<alphaTab.model.Track[]>([])
 const playbackTrack = ref<'guitar' | 'harmonica'>('harmonica')
+
+// Mapira alphaTab Beat objekte (iz OBE trake) nazad na poziciju note u
+// store.notes, za sinhronizovano markiranje trenutno svirane note u
+// Fretboard/GuitarTabView/HarmonicaTabView tokom reprodukcije. alphaTex.ts
+// generiše tačno jedan beat po noti, istim redosledom kao store.notes, pa je
+// redni broj beat-a (kroz sve taktove trake, po redu) == note.position.
+let beatIndexMap = new Map<alphaTab.model.Beat, number>()
+
+function buildBeatIndexMap(scoreTracks: alphaTab.model.Track[]): Map<alphaTab.model.Beat, number> {
+  const map = new Map<alphaTab.model.Beat, number>()
+  for (const track of scoreTracks) {
+    let idx = 0
+    for (const staff of track.staves) {
+      for (const bar of staff.bars) {
+        for (const voice of bar.voices) {
+          for (const beat of voice.beats) {
+            map.set(beat, idx)
+            idx++
+          }
+        }
+      }
+    }
+  }
+  return map
+}
 
 function currentTex(): string {
   return buildAlphaTex(store.notes, store.tuning, store.harmonicaKey)
@@ -52,10 +86,12 @@ onMounted(() => {
   const instance = new alphaTab.AlphaTabApi(container.value, {
     core: {
       tex: false,
+      fontDirectory: fontDirectoryUrl,
     },
     player: {
       enablePlayer: true,
       enableCursor: true,
+      enableAnimatedBeatCursor: true,
       soundFont: soundFontUrl,
       scrollElement: container.value,
     },
@@ -72,7 +108,14 @@ onMounted(() => {
   })
   instance.scoreLoaded.on((score) => {
     tracks.value = score.tracks
+    beatIndexMap = buildBeatIndexMap(score.tracks)
     applyTrackSelection()
+  })
+  // Prati alphaTab-ov ugrađeni kursor tokom reprodukcije i markira odgovarajuću
+  // notu u našim sopstvenim komponentama (isti mehanizam kao ručni klik na notu).
+  instance.playedBeatChanged.on((beat) => {
+    const position = beatIndexMap.get(beat)
+    if (position !== undefined) store.selectByPosition(position)
   })
 
   api.value = instance

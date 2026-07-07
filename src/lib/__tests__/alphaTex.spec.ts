@@ -65,4 +65,29 @@ describe('buildAlphaTex', () => {
     const guitarLine = tex.split('\n')[5]
     expect(guitarLine.indexOf('1.1.4')).toBeLessThan(guitarLine.indexOf('2.1.4'))
   })
+
+  it('eksplicitno postavlja \\ts kad takt ne sabira tačno na 4/4 (sprečava tihu pauzu)', () => {
+    // 3 četvrtine + 1 osmina = 14/16 -> sledeća četvrtina (4) bi prešla 16, pa se
+    // takt zatvara na 14 jedinica. Bez eksplicitnog \ts, alphaTab bi ovaj takt
+    // tretirao kao nepotpun 4/4 i tiho dopunio ostatak pauzom (14/16 -> 7/8 takt).
+    const notes: TabNoteData[] = [
+      note({ position: 0, duration: 'quarter', fret: 0 }),
+      note({ position: 1, duration: 'quarter', fret: 1 }),
+      note({ position: 2, duration: 'quarter', fret: 2 }),
+      note({ position: 3, duration: 'eighth', fret: 3 }),
+      note({ position: 4, duration: 'quarter', fret: 4 }),
+    ]
+    const tex = buildAlphaTex(notes, TUNING, 'C')
+    const guitarLine = tex.split('\n')[5]
+    const bars = guitarLine.split('|').map((b) => b.trim())
+    expect(bars[0]).toMatch(/^\\ts \(7 8\)/)
+    expect(bars[1]).toMatch(/^\\ts \(1 4\)/)
+  })
+
+  it('ne dodaje \\ts kad je takt puna 4/4 (podrazumevano, bez nepotrebnog šuma)', () => {
+    const notes: TabNoteData[] = [note({ position: 0, duration: 'whole' })]
+    const tex = buildAlphaTex(notes, TUNING, 'C')
+    const guitarLine = tex.split('\n')[5]
+    expect(guitarLine).not.toContain('\\ts')
+  })
 })
