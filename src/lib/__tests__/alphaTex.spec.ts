@@ -32,6 +32,13 @@ describe('buildAlphaTex', () => {
     expect(tex).toContain('\\tuning (E4 B3 G3 D3 A2 E2)')
   })
 
+  it('gitarska traka koristi GM instrument AcousticGuitarSteel da zvuk liči na gitaru', () => {
+    const tex = buildAlphaTex([note({ position: 0 })], TUNING, 'C')
+    const lines = tex.split('\n')
+    expect(lines[1]).toBe('\\track "Gitara"')
+    expect(lines[2]).toBe('\\instrument "AcousticGuitarSteel"')
+  })
+
   it('harmonička traka koristi note.note i GM instrument Harmonica', () => {
     const notes: TabNoteData[] = [note({ position: 0, note: 'C#5', duration: 'eighth' })]
     const tex = buildAlphaTex(notes, TUNING, 'C')
@@ -45,7 +52,7 @@ describe('buildAlphaTex', () => {
       note({ position: i, duration: 'whole', fret: i }),
     )
     const tex = buildAlphaTex(notes, TUNING, 'C')
-    const guitarLine = tex.split('\n')[4]
+    const guitarLine = tex.split('\n')[5]
     expect(guitarLine.split('|').length).toBe(5)
   })
 
@@ -55,7 +62,7 @@ describe('buildAlphaTex', () => {
       note({ position: 0, fret: 1, note: 'G4' }),
     ]
     const tex = buildAlphaTex(notes, TUNING, 'C')
-    const guitarLine = tex.split('\n')[4]
+    const guitarLine = tex.split('\n')[5]
     expect(guitarLine.indexOf('1.1.4')).toBeLessThan(guitarLine.indexOf('2.1.4'))
   })
 })

@@ -22,6 +22,11 @@ const DURATION_UNITS: Record<NoteDuration, number> = {
 
 const BAR_UNITS = 16
 
+// GM instrument imena su case-insensitive i bez razmaka (npr. "acousticguitarsteel"
+// mapira na General MIDI program 25) — vidi GeneralMidi._values tabelu u alphaTab-u.
+const GUITAR_INSTRUMENT = 'AcousticGuitarSteel'
+const HARMONICA_INSTRUMENT = 'Harmonica'
+
 function escapeAlphaTexString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
@@ -54,9 +59,10 @@ function splitIntoBars(sortedNotes: TabNoteData[]): TabNoteData[][] {
 
 /**
  * Generiše alphaTex izvor za trenutni tab: jedna traka za gitaru (tab
- * notacija, stvarni štim korisnika) i jedna traka za harmoniku (standardna
- * notacija, GM instrument "Harmonica"), sa istim ritmom preuzetim iz
- * note.duration polja.
+ * notacija, stvarni štim korisnika, GM instrument "AcousticGuitarSteel" da
+ * zvuk zaista liči na gitaru umesto default GM instrumenta) i jedna traka za
+ * harmoniku (standardna notacija, GM instrument "Harmonica"), sa istim
+ * ritmom preuzetim iz note.duration polja.
  *
  * store.tuning je niz visoko->nisko (string 1 = najviša žica), što je tačno
  * isti redosled koji alphaTex očekuje u `\tuning (...)` tagu, pa se
@@ -65,7 +71,15 @@ function splitIntoBars(sortedNotes: TabNoteData[]): TabNoteData[][] {
  */
 export function buildAlphaTex(notes: TabNoteData[], tuning: string[], harmonicaKey: string): string {
   if (notes.length === 0) {
-    return '\\tempo 120\n\\track "Gitara"\nr.4\n\\track "Harmonika"\n\\instrument "Harmonica"\nr.4'
+    return [
+      '\\tempo 120',
+      '\\track "Gitara"',
+      `\\instrument "${GUITAR_INSTRUMENT}"`,
+      'r.4',
+      '\\track "Harmonika"',
+      `\\instrument "${HARMONICA_INSTRUMENT}"`,
+      'r.4',
+    ].join('\n')
   }
 
   const sorted = [...notes].sort((a, b) => a.position - b.position)
@@ -82,11 +96,12 @@ export function buildAlphaTex(notes: TabNoteData[], tuning: string[], harmonicaK
   return [
     '\\tempo 120',
     '\\track "Gitara"',
+    `\\instrument "${GUITAR_INSTRUMENT}"`,
     `\\tuning (${tuningStr})`,
     '\\staff {tabs}',
     guitarBars.join(' | '),
     `\\track "${harmonicaLabel}"`,
-    '\\instrument "Harmonica"',
+    `\\instrument "${HARMONICA_INSTRUMENT}"`,
     '\\staff {score}',
     harmonicaBars.join(' | '),
   ].join('\n')
