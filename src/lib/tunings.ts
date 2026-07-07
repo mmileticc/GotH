@@ -32,3 +32,23 @@ const NOTE_PATTERN = /^[A-Ga-g](#|b)?[0-9]$/
 export function isValidNoteString(value: string): boolean {
   return NOTE_PATTERN.test(value.trim())
 }
+
+// --- Selektovanje note preko dropdown-ova (bez slobodnog kucanja) ----------
+
+// Uvek sharp zapis u dropdown-u (jednostavnije, jednoznačno; isti ton kao odgovarajući flat)
+export const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+// Pokriva uobičajene i drop/alternativne štimove (od kontrabas registra do visokih altova)
+export const OCTAVE_RANGE = [0, 1, 2, 3, 4, 5, 6]
+
+export function parseNoteString(value: string): { name: string; octave: number } {
+  const m = /^([A-Ga-g])([#b]?)([0-9])$/.exec(value.trim())
+  if (!m) return { name: 'E', octave: 4 }
+  const letter = m[1].toUpperCase()
+  const accidental = m[2]
+  return { name: letter + accidental, octave: parseInt(m[3], 10) }
+}
+
+export function buildNoteString(name: string, octave: number): string {
+  return `${name}${octave}`
+}

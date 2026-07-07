@@ -1,9 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { useEditorStore } from '@/stores/editorStore'
 import { HARMONICA_KEYS_COMMON, HARMONICA_KEYS_OTHER } from '@/lib/harmonica'
 import { lightenColor } from '@/lib/colorUtils'
-import { TUNING_PRESETS, CUSTOM_TUNING_ID, findPresetByTuning, isValidNoteString } from '@/lib/tunings'
+import {
+  TUNING_PRESETS,
+  CUSTOM_TUNING_ID,
+  NOTE_NAMES,
+  OCTAVE_RANGE,
+  findPresetByTuning,
+  parseNoteString,
+  buildNoteString,
+} from '@/lib/tunings'
 import type { FretTheme } from '@/types/tab'
 
 const store = useEditorStore()
@@ -39,35 +47,50 @@ function onAdvancedToggle(e: Event) {
 }
 
 // --- Tuning (Faza 2) -------------------------------------------------------
-const selectedPresetId = computed(() => findPresetByTuning(store.tuning))
+// uiPresetId je NEZAVISAN od store.tuning — prati šta je korisnik izabrao u
+// selectu, ne samo da li trenutni tuning slučajno odgovara nekom presetu.
+// Bez ovoga, biranje "Custom" se odmah "vraćalo" na pravi preset (npr.
+// "Standard") jer store.tuning još uvek odgovara njemu.
+const uiPresetId = ref(findPresetByTuning(store.tuning))
 const customStrings = ref<string[]>([...store.tuning])
-const customErrors = ref<boolean[]>(store.tuning.map(() => false))
 
 watch(
   () => store.tuning,
   (val) => {
-    if (findPresetByTuning(val) === CUSTOM_TUNING_ID) {
-      customStrings.value = [...val]
+    const matched = findPresetByTuning(val)
+    // sinhronizuj select samo kad tuning spolja promeni neko drugi mehanizam
+    // (npr. undo); dok je korisnik u "Custom" modu ne diramo izbor.
+    if (matched !== CUSTOM_TUNING_ID) {
+      uiPresetId.value = matched
     }
   },
 )
 
 function onPresetChange(e: Event) {
   const id = (e.target as HTMLSelectElement).value
+  uiPresetId.value = id
+
   if (id === CUSTOM_TUNING_ID) {
     customStrings.value = [...store.tuning]
     return
   }
+
   const preset = TUNING_PRESETS.find((p) => p.id === id)
   if (preset) store.setTuning(preset.tuning)
 }
 
-function onCustomStringInput(index: number, value: string) {
-  customStrings.value[index] = value
-  customErrors.value[index] = !isValidNoteString(value)
-  if (customStrings.value.every((v, i) => isValidNoteString(v) && !customErrors.value[i])) {
-    store.setTuning(customStrings.value)
-  }
+// Dropdown umesto slobodnog kucanja — bira se ime note i oktava posebno,
+// pa nema šanse za pogrešan format (nema kucanja teksta uopšte).
+function onStringNoteChange(index: number, newName: string) {
+  const { octave } = parseNoteString(customStrings.value[index])
+  customStrings.value[index] = buildNoteString(newName, octave)
+  store.setTuning(customStrings.value)
+}
+
+function onStringOctaveChange(index: number, newOctave: number) {
+  const { name } = parseNoteString(customStrings.value[index])
+  customStrings.value[index] = buildNoteString(name, newOctave)
+  store.setTuning(customStrings.value)
 }
 </script>
 
@@ -148,28 +171,33 @@ function onCustomStringInput(index: number, value: string) {
               </form>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-5">
               <label for="tuningPreset" class="form-label fw-bold">Štimovanje gitare</label>
-              <select id="tuningPreset" class="form-select" :value="selectedPresetId" @change="onPresetChange">
+              <select id="tuningPreset" class="form-select" :value="uiPresetId" @change="onPresetChange">
                 <option v-for="p in TUNING_PRESETS" :key="p.id" :value="p.id">{{ p.label }}</option>
                 <option :value="CUSTOM_TUNING_ID">Custom</option>
               </select>
             </div>
 
-            <div v-if="selectedPresetId === CUSTOM_TUNING_ID" class="col-md-6">
-              <label class="form-label fw-bold">Note po žici (visoko → nisko)</label>
-              <div class="d-flex gap-1 flex-wrap">
-                <input
-                  v-for="(s, i) in customStrings"
-                  :key="i"
-                  type="text"
-                  class="form-control"
-                  style="width: 4.5rem"
-                  :class="{ 'is-invalid': customErrors[i] }"
-                  :value="s"
-                  placeholder="npr. E4"
-                  @input="onCustomStringInput(i, ($event.target as HTMLInputElement).value)"
-                />
+            <div v-if="uiPresetId === CUSTOM_TUNING_ID" class="col-md-7">
+              <label class="form-label fw-bold mb-1">Note po žici (visoko → nisko)</label>
+              <div class="tuning-string-row" v-for="(s, i) in customStrings" :key="i">
+                <span class="tuning-string-label">Žica {{ i + 1 }}</span>
+                <select
+                  class="form-select form-select-sm"
+                  :value="parseNoteString(s).name"
+                  @change="onStringNoteChange(i, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option v-for="n in NOTE_NAMES" :key="n" :value="n">{{ n }}</option>
+                </select>
+                <select
+                  class="form-select form-select-sm"
+                  :value="parseNoteString(s).octave"
+                  @change="onStringOctaveChange(i, parseInt(($event.target as HTMLSelectElement).value, 10))"
+                >
+                  <option v-for="o in OCTAVE_RANGE" :key="o" :value="o">{{ o }}</option>
+                </select>
+                <span class="tuning-string-preview text-muted">{{ s }}</span>
               </div>
             </div>
           </div>
@@ -212,3 +240,27 @@ function onCustomStringInput(index: number, value: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.tuning-string-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.tuning-string-label {
+  min-width: 4.5rem;
+  font-size: 0.85rem;
+}
+
+.tuning-string-row select {
+  width: auto;
+  min-width: 4.5rem;
+}
+
+.tuning-string-preview {
+  font-size: 0.8rem;
+  min-width: 2.5rem;
+}
+</style>
