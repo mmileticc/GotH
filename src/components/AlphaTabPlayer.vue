@@ -35,10 +35,13 @@ const fontDirectoryUrl = `${import.meta.env.BASE_URL}font/`
 // prati DOM izmene unutar kontejnera i uklanja natpis čim se pojavi, bez
 // obzira na tačan trenutak kad ga alphaTab ubaci.
 const ALPHATAB_ATTRIBUTION_TEXT = 'rendered by alphaTab'
+const GUITAR_TEXT = 'Gitara'
+
+
 
 function removeAttributionText(root: HTMLElement) {
   root.querySelectorAll('text').forEach((el) => {
-    if (el.textContent?.trim() === ALPHATAB_ATTRIBUTION_TEXT) {
+    if (el.textContent?.trim() === ALPHATAB_ATTRIBUTION_TEXT || el.textContent?.trim() === GUITAR_TEXT) {
       el.remove()
     }
   })

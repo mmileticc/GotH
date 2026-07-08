@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildAlphaTex } from '../alphaTex'
+import { buildAlphaTex, buildAlphaTexForExport } from '../alphaTex'
 import type { TabNoteData } from '@/types/tab'
 
 const TUNING = ['E4', 'B3', 'G3', 'D3', 'A2', 'E2']
@@ -89,5 +89,28 @@ describe('buildAlphaTex', () => {
     const tex = buildAlphaTex(notes, TUNING, 'C')
     const guitarLine = tex.split('\n')[5]
     expect(guitarLine).not.toContain('\\ts')
+  })
+})
+
+describe('buildAlphaTexForExport', () => {
+  it('vraća prazan takt (bez harmonika trake) za praznu tab notaciju', () => {
+    const tex = buildAlphaTexForExport([], TUNING)
+    expect(tex).toContain('r.4')
+    expect(tex).toContain('\\track "Gitara"')
+    expect(tex).not.toContain('Harmonika')
+  })
+
+  it('generiše samo JEDNU traku sa {score tabs} (notacija + tab zajedno)', () => {
+    const notes: TabNoteData[] = [note({ position: 0, string: 0, fret: 3, note: 'G4', duration: 'quarter' })]
+    const tex = buildAlphaTexForExport(notes, TUNING)
+    expect(tex.match(/\\track/g)?.length).toBe(1)
+    expect(tex).toContain('\\staff {score tabs}')
+    expect(tex).toContain('3.1.4')
+  })
+
+  it('ne sadrži \\instrument (nema audio reprodukcije za export render)', () => {
+    const notes: TabNoteData[] = [note({ position: 0 })]
+    const tex = buildAlphaTexForExport(notes, TUNING)
+    expect(tex).not.toContain('\\instrument')
   })
 })

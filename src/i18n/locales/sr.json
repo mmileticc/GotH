@@ -127,5 +127,17 @@
   "alphatab_track_harmonica": "🎵 Harmonika",
   "alphatab_track_aria": "Izbor trake za reprodukciju",
   "alphatab_loading": "Učitavanje sound fonta…",
-  "alphatab_error_prefix": "Greška: "
+  "alphatab_error_prefix": "Greška: ",
+  "save_section_text": "Izvoz u tekst",
+  "save_section_image": "Izvoz u sliku",
+  "save_image_button": "Sačuvaj kao sliku (PNG)",
+  "save_image_generating": "Generisanje…",
+  "export_image_empty_error": "Dodaj bar jednu notu pre izvoza slike.",
+  "settings_section_fretboard": "Izgled vrata",
+  "settings_section_notation": "Notni zapis",
+  "settings_section_tuning": "Štimovanje",
+  "settings_section_harmonica": "Harmonika",
+  "toolbar_group_edit": "Uređivanje",
+  "toolbar_group_history": "Istorija",
+  "settings_toggle_label": "Podešavanja"
 }

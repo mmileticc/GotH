@@ -21,4 +21,9 @@ export default defineConfig(({ command }) => ({
     environment: 'jsdom',
     globals: true,
   },
+  
+  server: {
+    host: '0.0.0.0',   // obavezno da bi radio preko IP adrese
+    port: 5173,
+  }
 }))

@@ -57,65 +57,99 @@ function setDuration(d: NoteDuration) {
           <h3>{{ $t('guitartabs_h3') }}</h3>
           <GuitarTabView />
 
-          <div id="tabControls" class="my-3 d-flex gap-2 align-items-center flex-wrap">
-            <button id="btnToggleMode" class="btn btn-outline-secondary">
-              <div class="form-check form-switch">
-                <input id="modeSwitch" v-model="insertMode" class="form-check-input" type="checkbox" />
-                <label class="form-check-label" for="modeSwitch">
-                  {{ insertMode ? $t('mode_insert') : $t('mode_edit') }}
-                </label>
+          <div id="tabControls" class="toolbar">
+            <div class="toolbar-group">
+              <span class="toolbar-group-label">{{ $t('toolbar_group_edit') }}</span>
+
+              <div class="btn-group btn-group-sm" role="group" :aria-label="$t('toolbar_group_edit')">
+                <input
+                  id="modeEditRadio"
+                  type="radio"
+                  class="btn-check"
+                  autocomplete="off"
+                  :checked="!insertMode"
+                  @change="insertMode = false"
+                />
+                <label class="btn btn-outline-secondary" for="modeEditRadio">{{ $t('mode_edit') }}</label>
+
+                <input
+                  id="modeInsertRadio"
+                  type="radio"
+                  class="btn-check"
+                  autocomplete="off"
+                  :checked="insertMode"
+                  @change="insertMode = true"
+                />
+                <label class="btn btn-outline-secondary" for="modeInsertRadio">{{ $t('mode_insert') }}</label>
               </div>
-            </button>
 
-            <button id="btnDelete" class="btn btn-outline-secondary" @click="store.deleteSelected()">
-              {{ $t('delete_button') }}
-            </button>
+              <button id="btnDelete" class="btn btn-sm btn-outline-secondary" @click="store.deleteSelected()">
+                {{ $t('delete_button') }}
+              </button>
 
-            <button id="btnClear" class="btn btn-outline-danger" @click="clearModalOpen = true">
-              {{ $t('clear_button') }}
-            </button>
-
-            <div class="vr mx-1"></div>
-
-            <button
-              class="btn btn-outline-secondary"
-              :title="$t('undo_title')"
-              :disabled="!store.canUndo"
-              @click="store.undo()"
-            >
-              ↶ {{ $t('undo_button') }}
-            </button>
-            <button
-              class="btn btn-outline-secondary"
-              :title="$t('redo_title')"
-              :disabled="!store.canRedo"
-              @click="store.redo()"
-            >
-              ↷ {{ $t('redo_button') }}
-            </button>
-
-            <div v-if="selectedNote" class="d-flex align-items-center gap-1 ms-2">
-              <span class="text-muted small me-1">{{ $t('duration_label') }}</span>
-              <button
-                v-for="d in DURATIONS"
-                :key="d.value"
-                type="button"
-                class="btn btn-sm"
-                :class="selectedNote.duration === d.value ? 'btn-secondary' : 'btn-outline-secondary'"
-                @click="setDuration(d.value)"
-              >
-                {{ d.label }}
+              <button id="btnClear" class="btn btn-sm btn-outline-danger" @click="clearModalOpen = true">
+                {{ $t('clear_button') }}
               </button>
             </div>
+
+            <div class="toolbar-divider" aria-hidden="true"></div>
+
+            <div class="toolbar-group">
+              <span class="toolbar-group-label">{{ $t('toolbar_group_history') }}</span>
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                :title="$t('undo_title')"
+                :disabled="!store.canUndo"
+                @click="store.undo()"
+              >
+                ↶ {{ $t('undo_button') }}
+              </button>
+              <button
+                class="btn btn-sm btn-outline-secondary"
+                :title="$t('redo_title')"
+                :disabled="!store.canRedo"
+                @click="store.redo()"
+              >
+                ↷ {{ $t('redo_button') }}
+              </button>
+            </div>
+
+            <template v-if="selectedNote">
+              <div class="toolbar-divider" aria-hidden="true"></div>
+
+              <div class="toolbar-group">
+                <span class="toolbar-group-label">{{ $t('duration_label') }}</span>
+                <div class="btn-group btn-group-sm" role="group" :aria-label="$t('duration_label')">
+                  <button
+                    v-for="d in DURATIONS"
+                    :key="d.value"
+                    type="button"
+                    class="btn"
+                    :class="selectedNote.duration === d.value ? 'btn-secondary' : 'btn-outline-secondary'"
+                    @click="setDuration(d.value)"
+                  >
+                    {{ d.label }}
+                  </button>
+                </div>
+              </div>
+            </template>
           </div>
 
           <ClearConfirmModal v-model="clearModalOpen" />
         </div>
 
         <div class="col-lg-3" id="harDiv">
-          <div class="row">
-            <h3 class="col-10">{{ $t('harmonicatabs_h3') }}</h3>
-            <button type="button" class="btn col-2" @click="legendModalOpen = true">?</button>
+          <div class="harmonica-header">
+            <h3 class="mb-0">{{ $t('harmonicatabs_h3') }}</h3>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary legend-btn"
+              :aria-label="$t('legend_modal_title')"
+              :title="$t('legend_modal_title')"
+              @click="legendModalOpen = true"
+            >
+              ?
+            </button>
           </div>
           <HarmonicaTabView />
         </div>
@@ -129,7 +163,7 @@ function setDuration(d: NoteDuration) {
       </div>
 
       <div class="save">
-        <button id="btnSaveText" class="btn btn-theme" :class="`btn-${store.fretTheme}`" @click="saveModalOpen = true">
+        <button id="btnSaveText" class="btn btn-lg btn-theme" :class="`btn-${store.fretTheme}`" @click="saveModalOpen = true">
           {{ $t('save_button_text') }}
         </button>
 
@@ -142,3 +176,72 @@ function setDuration(d: NoteDuration) {
     <small>{{ $t('footer_text') }}</small>
   </footer>
 </template>
+
+<style scoped>
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.toolbar-group-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-right: 0.15rem;
+}
+
+.toolbar-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border-color);
+  min-height: 1.5rem;
+}
+
+@media (max-width: 576px) {
+  .toolbar {
+    gap: 0.6rem;
+  }
+  .toolbar-divider {
+    display: none;
+  }
+}
+
+.harmonica-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.legend-btn {
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  flex: 0 0 auto;
+  font-weight: 700;
+}
+
+.save {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0 1rem;
+}
+</style>

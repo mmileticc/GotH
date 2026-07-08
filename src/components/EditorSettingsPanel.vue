@@ -96,14 +96,17 @@ function onStringOctaveChange(index: number, newOctave: number) {
 
 <template>
   <div id="settings">
-    <button id="settingsToggle" class="btn btn-outline-secondary mb-2" type="button" @click="toggle">⚙️</button>
+    <button id="settingsToggle" class="btn btn-outline-secondary mb-2" type="button" @click="toggle">
+      ⚙️ {{ $t('settings_toggle_label') }}
+    </button>
 
-    <div v-show="open" id="settingsPanel">
-      <div class="row my-3 g-3 control-panel">
-        <div id="guitarSettings" class="col-md-9">
-          <div class="row g-3">
-            <div class="col-md-4">
-              <label for="fretTheme"><strong>{{ $t('settings_design_label') }}</strong></label>
+    <div v-show="open" id="settingsPanel" class="control-panel">
+      <div class="settings-grid">
+        <section id="guitarSettings" class="settings-card">
+          <h6 class="settings-card-title">{{ $t('settings_section_fretboard') }}</h6>
+          <div class="settings-card-body">
+            <div class="settings-field">
+              <label for="fretTheme" class="form-label fw-bold">{{ $t('settings_design_label') }}</label>
               <select id="fretTheme" class="form-select" :value="store.fretTheme" @change="onThemeChange">
                 <option value="mahogany">{{ $t('opt_mahogany') }}</option>
                 <option value="maple">{{ $t('opt_maple') }}</option>
@@ -115,42 +118,13 @@ function onStringOctaveChange(index: number, newOctave: number) {
                 v-if="store.fretTheme === 'custom'"
                 id="customColor"
                 type="color"
+                class="mt-2"
                 :value="store.customColor"
                 @input="onColorInput"
               />
             </div>
 
-            <div class="col-md-4">
-              <span class="fw-bold">{{ $t('preference_label') }}</span>
-              <div>
-                <div class="form-check form-check-inline">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    id="sharp"
-                    name="sharpflat"
-                    value="sharp"
-                    :checked="store.notation === 'sharp'"
-                    @change="store.setNotation('sharp')"
-                  />
-                  <label class="form-check-label" for="sharp">{{ $t('sharp_label') }}</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input
-                    class="form-check-input"
-                    type="radio"
-                    id="flat"
-                    name="sharpflat"
-                    value="flat"
-                    :checked="store.notation === 'flat'"
-                    @change="store.setNotation('flat')"
-                  />
-                  <label class="form-check-label" for="flat">{{ $t('flat_label') }}</label>
-                </div>
-              </div>
-            </div>
-
-            <div class="col-md-4">
+            <div class="settings-field">
               <form id="fretForm" @submit.prevent="onFretFormSubmit">
                 <label for="numOfFrets" class="form-label fw-bold">{{ $t('num_of_frets_label') }}</label>
                 <div class="input-group">
@@ -170,8 +144,44 @@ function onStringOctaveChange(index: number, newOctave: number) {
                 </div>
               </form>
             </div>
+          </div>
+        </section>
 
-            <div class="col-md-5">
+        <section class="settings-card">
+          <h6 class="settings-card-title">{{ $t('settings_section_notation') }}</h6>
+          <div class="settings-card-body">
+            <div class="settings-field">
+              <div class="btn-group w-100" role="group" :aria-label="$t('preference_label')">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  id="sharp"
+                  name="sharpflat"
+                  autocomplete="off"
+                  :checked="store.notation === 'sharp'"
+                  @change="store.setNotation('sharp')"
+                />
+                <label class="btn btn-outline-secondary" for="sharp">{{ $t('sharp_label') }}</label>
+
+                <input
+                  type="radio"
+                  class="btn-check"
+                  id="flat"
+                  name="sharpflat"
+                  autocomplete="off"
+                  :checked="store.notation === 'flat'"
+                  @change="store.setNotation('flat')"
+                />
+                <label class="btn btn-outline-secondary" for="flat">{{ $t('flat_label') }}</label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-card">
+          <h6 class="settings-card-title">{{ $t('settings_section_tuning') }}</h6>
+          <div class="settings-card-body">
+            <div class="settings-field">
               <label for="tuningPreset" class="form-label fw-bold">{{ $t('tuning_label') }}</label>
               <select id="tuningPreset" class="form-select" :value="uiPresetId" @change="onPresetChange">
                 <option v-for="p in TUNING_PRESETS" :key="p.id" :value="p.id">{{ p.label }}</option>
@@ -179,7 +189,7 @@ function onStringOctaveChange(index: number, newOctave: number) {
               </select>
             </div>
 
-            <div v-if="uiPresetId === CUSTOM_TUNING_ID" class="col-md-7">
+            <div v-if="uiPresetId === CUSTOM_TUNING_ID" class="settings-field">
               <label class="form-label fw-bold mb-1">{{ $t('tuning_custom_label') }}</label>
               <div class="tuning-string-row" v-for="(s, i) in customStrings" :key="i">
                 <span class="tuning-string-label">{{ $t('tuning_string_label') }} {{ i + 1 }}</span>
@@ -201,11 +211,12 @@ function onStringOctaveChange(index: number, newOctave: number) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div id="harmonicaSettings" class="col-md-3">
-          <div class="row g-3">
-            <div class="col-12">
+        <section id="harmonicaSettings" class="settings-card">
+          <h6 class="settings-card-title">{{ $t('settings_section_harmonica') }}</h6>
+          <div class="settings-card-body">
+            <div class="settings-field">
               <label for="harmonicaKey" class="form-label fw-bold">{{ $t('harmonica_key_label') }}</label>
               <select
                 id="harmonicaKey"
@@ -222,8 +233,8 @@ function onStringOctaveChange(index: number, newOctave: number) {
               </select>
             </div>
 
-            <div class="col-12">
-              <div class="form-check">
+            <div class="settings-field">
+              <div class="form-check form-switch">
                 <input
                   class="form-check-input"
                   type="checkbox"
@@ -235,18 +246,49 @@ function onStringOctaveChange(index: number, newOctave: number) {
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.settings-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.9rem 1rem 1.1rem;
+}
+
+.settings-card-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.settings-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
 .tuning-string-row {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .tuning-string-label {
@@ -262,5 +304,11 @@ function onStringOctaveChange(index: number, newOctave: number) {
 .tuning-string-preview {
   font-size: 0.8rem;
   min-width: 2.5rem;
+}
+
+@media (max-width: 576px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

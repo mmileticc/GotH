@@ -127,5 +127,17 @@
   "alphatab_track_harmonica": "🎵 Harmonica",
   "alphatab_track_aria": "Select playback track",
   "alphatab_loading": "Loading sound font…",
-  "alphatab_error_prefix": "Error: "
+  "alphatab_error_prefix": "Error: ",
+  "save_section_text": "Text export",
+  "save_section_image": "Image export",
+  "save_image_button": "Save as image (PNG)",
+  "save_image_generating": "Generating…",
+  "export_image_empty_error": "Add at least one note before exporting an image.",
+  "settings_section_fretboard": "Fretboard Design",
+  "settings_section_notation": "Notation",
+  "settings_section_tuning": "Tuning",
+  "settings_section_harmonica": "Harmonica",
+  "toolbar_group_edit": "Edit",
+  "toolbar_group_history": "History",
+  "settings_toggle_label": "Settings"
 }

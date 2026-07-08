@@ -152,3 +152,38 @@ export function buildAlphaTex(notes: TabNoteData[], tuning: string[], harmonicaK
     harmonicaBars.join(' | '),
   ].join('\n')
 }
+
+/**
+ * Generiše alphaTex isključivo za PNG export (vidi exportImage.ts): JEDNA
+ * traka (gitara), sa `{score tabs}` (notacija I gitarski tab zajedno — ovde,
+ * za razliku od buildAlphaTex korišćenog u AlphaTabPlayer-u, tab NIJE
+ * suvišan jer se ništa drugo ne renderuje iznad slike). Harmonika se
+ * namerno NE generiše kao alphaTex traka — brojevi rupica harmonike se
+ * dodaju naknadno kao overlay, pozicionirani preko api.boundsLookup (vidi
+ * NotationExporter.vue), poravnati tačno ispod odgovarajuće note.
+ *
+ * Nema audio reprodukcije za export render, pa GM instrument nije bitan.
+ */
+export function buildAlphaTexForExport(notes: TabNoteData[], tuning: string[]): string {
+  if (notes.length === 0) {
+    return ['\\tempo 120', '\\track "Gitara"', `\\tuning (${tuning.join(' ')})`, '\\staff {score tabs}', 'r.4'].join(
+      '\n',
+    )
+  }
+
+  const sorted = [...notes].sort((a, b) => a.position - b.position)
+  const bars = splitIntoBars(sorted)
+  const tsPrefixes = computeTsPrefixes(bars)
+  const guitarBars = bars.map(
+    (bar, i) => tsPrefixes[i] + bar.map((n) => `${n.fret}.${n.string + 1}.${DURATION_VALUE[n.duration]}`).join(' '),
+  )
+  const tuningStr = tuning.join(' ')
+
+  return [
+    '\\tempo 120',
+    '\\track "Gitara"',
+    `\\tuning (${tuningStr})`,
+    '\\staff {score tabs}',
+    guitarBars.join(' | '),
+  ].join('\n')
+}
