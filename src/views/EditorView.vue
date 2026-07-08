@@ -10,10 +10,17 @@ import AlphaTabPlayer from '@/components/AlphaTabPlayer.vue'
 import ClearConfirmModal from '@/components/ClearConfirmModal.vue'
 import LegendModal from '@/components/LegendModal.vue'
 import SaveExportModal from '@/components/SaveExportModal.vue'
+import { tuningDisplayName } from '@/lib/tunings'
 import type { NoteDuration } from '@/types/tab'
 
 const store = useEditorStore()
 useTabEditingKeyboard()
+
+// Prikaz imena trenutnog štima pored naslova gitarskih tabova — korisno sad
+// kad ima više gotovih štimova (Drop D, DADGAD, Open G...), da se ne mora
+// otvarati podešavanja da bi se videlo šta je trenutno aktivno. Ista funkcija
+// se koristi i za naslov trake u PNG exportu (vidi lib/alphaTex.ts).
+const currentTuningLabel = computed(() => tuningDisplayName(store.tuning))
 
 const clearModalOpen = ref(false)
 const legendModalOpen = ref(false)
@@ -54,7 +61,12 @@ function setDuration(d: NoteDuration) {
 
       <div class="row">
         <div class="col-lg-9">
-          <h3>{{ $t('guitartabs_h3') }}</h3>
+          <div class="guitartabs-header">
+            <h3 class="mb-0">{{ $t('guitartabs_h3') }}</h3>
+            <span class="tuning-badge" :title="$t('tuning_label')">
+              {{ $t('guitartabs_tuning_current') }} {{ currentTuningLabel }}
+            </span>
+          </div>
           <GuitarTabView />
 
           <div id="tabControls" class="toolbar">
@@ -220,6 +232,26 @@ function setDuration(d: NoteDuration) {
   .toolbar-divider {
     display: none;
   }
+}
+
+.guitartabs-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tuning-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  white-space: nowrap;
 }
 
 .harmonica-header {

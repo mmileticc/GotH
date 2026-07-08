@@ -27,6 +27,27 @@ export function findPresetByTuning(tuning: string[]): string {
   return match ? match.id : CUSTOM_TUNING_ID
 }
 
+// Čitljivo ime trenutnog štima — koristi se i u UI (pored naslova gitarskih
+// tabova) i u PNG exportu (kao deo naslova trake, da se zna koji je štim
+// korišćen kad se slika sačuva/podeli van aplikacije).
+export function tuningDisplayName(tuning: string[]): string {
+  const id = findPresetByTuning(tuning)
+  if (id === CUSTOM_TUNING_ID) return tuning.join(' ')
+  return TUNING_PRESETS.find((p) => p.id === id)?.label ?? tuning.join(' ')
+}
+
+// Detaljan prikaz štima po žicama (1 = najviša/tanja žica, isti redosled
+// kao UI za podešavanje štima i store.tuning niz) — npr. "1=E4  2=B3  3=G3
+// 4=D3  5=A2  6=E2". Koristi se na PNG exportu (vidi NotationExporter.vue)
+// da se tačno vidi koja je žica na koji ton naštimovana, bez potrebe da se
+// vraćaš u editor. Namerno se NE ugrađuje u alphaTab-ov naslov trake — taj
+// naslov se iscrtava u uskoj, fiksne širine, ROTIRANOJ koloni napravljenoj
+// za jednu kratku reč (npr. "Gitara"/"Harmonika"), pa duži tekst tu biva
+// odsečen/nečitljiv. Umesto toga se ispisuje kao poseban red preko canvas-a.
+export function tuningStringBreakdown(tuning: string[]): string {
+  return tuning.map((note, i) => `${i + 1}=${note}`).join('  ')
+}
+
 const NOTE_PATTERN = /^[A-Ga-g](#|b)?[0-9]$/
 
 export function isValidNoteString(value: string): boolean {

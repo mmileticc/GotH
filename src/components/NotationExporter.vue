@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import * as alphaTab from '@coderline/alphatab'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildAlphaTexForExport } from '@/lib/alphaTex'
+import { tuningStringBreakdown } from '@/lib/tunings'
 import { downloadBlob } from '@/lib/exportImage'
 import type { TabNoteData } from '@/types/tab'
 
@@ -65,6 +66,7 @@ const RENDER_TIMEOUT_MS = 20000
 
 const ALPHATAB_ATTRIBUTION_TEXT = 'rendered by alphaTab'
 const EXPORT_PADDING = 16
+const TUNING_CAPTION_H = 20
 const HARMONICA_LABEL_H = 20
 const HARMONICA_ROW_GAP = 10
 const HARMONICA_ROW_H = 32
@@ -322,7 +324,7 @@ async function exportPng() {
       : 0
 
     const totalWidth = notationWidth + EXPORT_PADDING * 2
-    const totalHeight = notationHeight + harmonicaBlockHeight + EXPORT_PADDING * 2
+    const totalHeight = TUNING_CAPTION_H + notationHeight + harmonicaBlockHeight + EXPORT_PADDING * 2
     surfaceWidth.value = totalWidth
 
     const canvas = document.createElement('canvas')
@@ -334,12 +336,27 @@ async function exportPng() {
     ctx.fillStyle = '#ffffff'
     ctx.fillRect(0, 0, totalWidth, totalHeight)
 
+    // Puni prikaz štima (po žicama) kao poseban red iznad notacije — vidi
+    // napomenu u lib/tunings.ts (tuningStringBreakdown) i lib/alphaTex.ts
+    // (buildAlphaTexForExport) zašto se ovo NE ugrađuje u alphaTab-ov naslov
+    // trake (ta kolona je uska, fiksne širine, napravljena za jednu kratku
+    // reč, pa duži tekst tu biva odsečen).
+    ctx.fillStyle = '#333333'
+    ctx.font = "600 13px 'Segoe UI', Tahoma, sans-serif"
+    ctx.textAlign = 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.fillText(
+      `${t('guitartabs_tuning_current')} ${tuningStringBreakdown(store.tuning)}`,
+      EXPORT_PADDING,
+      EXPORT_PADDING + TUNING_CAPTION_H - 6,
+    )
+
     svgPositions.forEach((p, i) => {
-      ctx.drawImage(images[i], EXPORT_PADDING + p.x, EXPORT_PADDING + p.y, p.w, p.h)
+      ctx.drawImage(images[i], EXPORT_PADDING + p.x, EXPORT_PADDING + TUNING_CAPTION_H + p.y, p.w, p.h)
     })
 
     if (harmonicaLabels.length) {
-      const labelY = EXPORT_PADDING + notationHeight + HARMONICA_LABEL_H
+      const labelY = EXPORT_PADDING + TUNING_CAPTION_H + notationHeight + HARMONICA_LABEL_H
       ctx.fillStyle = '#333333'
       ctx.font = "600 13px 'Segoe UI', Tahoma, sans-serif"
       ctx.textAlign = 'left'

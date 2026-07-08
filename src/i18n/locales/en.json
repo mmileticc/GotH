@@ -139,5 +139,6 @@
   "settings_section_harmonica": "Harmonica",
   "toolbar_group_edit": "Edit",
   "toolbar_group_history": "History",
-  "settings_toggle_label": "Settings"
+  "settings_toggle_label": "Settings",
+  "guitartabs_tuning_current": "Tuning:"
 }

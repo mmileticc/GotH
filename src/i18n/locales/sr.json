@@ -139,5 +139,6 @@
   "settings_section_harmonica": "Harmonika",
   "toolbar_group_edit": "Uređivanje",
   "toolbar_group_history": "Istorija",
-  "settings_toggle_label": "Podešavanja"
+  "settings_toggle_label": "Podešavanja",
+  "guitartabs_tuning_current": "Štim:"
 }

@@ -163,6 +163,12 @@ export function buildAlphaTex(notes: TabNoteData[], tuning: string[], harmonicaK
  * NotationExporter.vue), poravnati tačno ispod odgovarajuće note.
  *
  * Nema audio reprodukcije za export render, pa GM instrument nije bitan.
+ *
+ * Naslov trake ostaje kratak ("Gitara") — alphaTab ga iscrtava u USKOJ,
+ * fiksne širine, ROTIRANOJ koloni napravljenoj za jednu kratku reč, pa duži
+ * tekst (npr. puno ime štima) tu biva odsečen/nečitljiv. Puni prikaz štima
+ * (po žicama) se umesto toga iscrtava kao poseban red preko canvas-a u
+ * NotationExporter.vue (vidi tuningStringBreakdown u lib/tunings.ts).
  */
 export function buildAlphaTexForExport(notes: TabNoteData[], tuning: string[]): string {
   if (notes.length === 0) {
