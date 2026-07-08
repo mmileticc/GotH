@@ -17,22 +17,34 @@ import type { TabNoteData } from '@/types/tab'
 // su koristile html2canvas biblioteku da "uslika" ceo DOM kontejner.
 // - html2canvas u podrazumevanom režimu iscrtava tekst preko SOPSTVENOG
 //   canvas 2D fillText mehanizma (ne oslanja se na pravo renderovanje
-//   browsera) — Bravura SMuFL notni font (note glave, viole, taktovi) mu je
-//   nevidljiv (ne parsira font-face koji alphaTab dinamički ubacuje preko
-//   Font Loading API-ja, bez CSS @font-face pravila u document.styleSheets),
-//   pa su note ispadale kao prazni kvadratići ("tofu").
-// - `foreignObjectRendering: true` opcija (koja prebacuje html2canvas da
-//   pusti SAM BROWSER da rasterizuje DOM preko SVG <foreignObject>) je
-//   umesto toga davala potpuno CRNU sliku — poznat, često prijavljivan bag
-//   html2canvas biblioteke sa foreignObject + eksterni font resursi.
-// Rešenje: html2canvas je NAPUŠTEN u potpunosti. Umesto toga, direktno
-// serijalizujemo alphaTab-ov stvarni <svg> DOM (alphaTab na webu uvek
-// renderuje kao pravi SVG, ne canvas), UGRADIMO Bravura font kao base64
-// unutar samog SVG-a (da bude samodovoljan van stranice), i pustimo
-// BROWSER (native <img> + <svg xmlns="...">) da ga ispravno rasterizuje —
-// isti mehanizam koji već ispravno prikazuje notaciju na ekranu. Harmonika
-// overlay (obični monospace brojevi) se crta direktno preko canvas
-// fillText/fillRect poziva — bez custom fonta, bez rizika.
+//   browsera) — Bravura SMuFL notni font mu je nevidljiv, pa su note
+//   ispadale kao prazni kvadratići ("tofu").
+// - `foreignObjectRendering: true` opcija je umesto toga davala potpuno
+//   CRNU sliku — poznat, često prijavljivan bag html2canvas biblioteke.
+// Rešenje: html2canvas je NAPUŠTEN. Umesto toga, direktno serijalizujemo
+// alphaTab-ov stvarni <svg> DOM i pustimo BROWSER da ga rasterizuje preko
+// <img> + <canvas> drawImage.
+//
+// PRAVI UZROK praznih kvadratića (pronađeno čitanjem IZVORA alphaTab-a,
+// klase `CssFontSvgCanvas` u @coderline/alphatab/dist/alphaTab.core.mjs —
+// ovo je klasa koja se stvarno koristi za SVG rendering na webu):
+// note glave/perca/violinski ključ se NE iscrtavaju sa font-family
+// direktno na <text> elementu (za razliku od običnog teksta kao "Gitara"
+// ili "120", koji font postavlja INLINE preko style="font: ..."). Umesto
+// toga, muzički simboli dobijaju samo `<g class="at"><text style="stroke:
+// none">&#kod;</text></g>` — BEZ ikakvog font-family na samom elementu —
+// i oslanjaju se na GLOBALNO CSS pravilo koje alphaTab ubaci u
+// document.head: `.at-surface.atN .at { font-family: 'alphaTab'; ... }`.
+// Kad izdvojimo/klonišemo SAMO <svg> element i serijalizujemo ga kao
+// samostalnu sliku, TA GLOBALNA STRANIČNA PRAVILA se NE PRENOSE — pa
+// element ostaje bez ikakvog font-family, bez obzira na to koliko dobro
+// registrujemo @font-face (font postoji, ali ništa ne kaže da ga note
+// glave treba da koriste). Ranije verzije ovog fajla su pokušavale da
+// POGODE i registruju ispravno ime fonta preko @font-face, što je
+// nužno ali NEDOVOLJNO — trebalo je i FORSIRATI font-family kao INLINE
+// stil direktno na `.at` elemente (koji UVEK preživljava serijalizaciju/
+// kloniranje, za razliku od spoljašnjeg CSS pravila po klasi). To radi
+// forceMusicFontInline() ispod.
 
 const { t } = useI18n()
 const store = useEditorStore()
@@ -44,8 +56,7 @@ const BRAVURA_FONT_URL = `${fontDirectoryUrl}Bravura.woff2`
 // ceo render ("[AlphaTab][Rendering] skipped rendering because of width=0
 // (element invisible)") ako u trenutku kreiranja API-ja kontejner ima
 // width=0. Kontejner MORA imati konkretnu, ne-nultu širinu VEĆ PRE nego
-// što se AlphaTabApi konstruiše (ne tek posle, kad se širina inače tačno
-// izračuna iz stvarnog sadržaja).
+// što se AlphaTabApi konstruiše.
 const PLACEHOLDER_WIDTH = 1600
 // Vremenski budžet za render — ako alphaTab iz bilo kog razloga nikad ne
 // okine postRenderFinished/error, ne smemo da ostanemo zaglavljeni zauvek
@@ -75,20 +86,52 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary)
 }
 
+// getComputedStyle().fontFamily vraća CEO CSS font-family STEK, npr.
+// `alphaTab, sans-serif` (zarezom odvojena lista imena, ne jedno ime) — a
+// @font-face-ov `font-family` deskriptor MORA biti TAČNO JEDNO ime.
+function firstFontFamilyName(computedFontFamily: string): string {
+  const first = computedFontFamily.split(',')[0] ?? computedFontFamily
+  return first.trim().replace(/^["']|["']$/g, '')
+}
+
+// Muzički simboli (note glave, perca, violinski ključ...) dobijaju klasu
+// "at" (vidi napomenu na vrhu fajla o CssFontSvgCanvas) i font-family im
+// stiže SAMO preko globalnog CSS pravila po toj klasi — koje se GUBI kad
+// izdvojimo <svg> iz stranice. Ovde ČITAMO tačno ime fonta koje trenutno
+// (dok je element još deo žive stranice, pre kloniranja) cascade rešava
+// na svaki ".at" element, i odmah ga FORSIRAMO kao INLINE stil na taj
+// element — inline stil UVEK preživljava serijalizaciju/kloniranje.
+function forceMusicFontInline(svgs: SVGSVGElement[]): Set<string> {
+  const families = new Set<string>()
+  for (const svg of svgs) {
+    svg.querySelectorAll('.at').forEach((el) => {
+      const family = firstFontFamilyName(getComputedStyle(el).fontFamily)
+      families.add(family)
+      ;(el as SVGElement).style.setProperty('font-family', `"${family}"`)
+    })
+  }
+  return families
+}
+
 // Ubacuje Bravura font kao base64 @font-face DIREKTNO u svaki <svg>, tako
 // da bude samodovoljan kad se izdvoji i prikaže kao samostalna slika (SVG
 // prikazan preko <img> ne nasleđuje stilove roditeljske stranice — zato
 // font mora biti UNUTAR samog SVG-a, ne samo u document.head-u).
 async function embedFontIntoSvgs(svgs: SVGSVGElement[]): Promise<void> {
   if (svgs.length === 0) return
-  const sampleText = svgs[0].querySelector('text')
-  const fontFamily = sampleText ? getComputedStyle(sampleText).fontFamily : 'alphaTab'
+  const families = forceMusicFontInline(svgs)
+  if (families.size === 0) families.add('alphaTab')
 
   const resp = await fetch(BRAVURA_FONT_URL)
   if (!resp.ok) throw new Error(`Font fetch failed (${resp.status}): ${BRAVURA_FONT_URL}`)
   const buf = await resp.arrayBuffer()
   const base64 = arrayBufferToBase64(buf)
-  const css = `@font-face { font-family: ${fontFamily}; src: url(data:font/woff2;base64,${base64}) format('woff2'); }`
+  const css = Array.from(families)
+    .map(
+      (family) =>
+        `@font-face { font-family: "${family}"; src: url(data:font/woff2;base64,${base64}) format('woff2'); }`,
+    )
+    .join('\n')
 
   for (const svg of svgs) {
     const style = document.createElementNS('http://www.w3.org/2000/svg', 'style')
@@ -108,8 +151,9 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 function svgToImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
   const serialized = new XMLSerializer().serializeToString(svg)
-  const dataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(serialized)
-  return loadImage(dataUrl)
+  const blob = new Blob([serialized], { type: 'image/svg+xml;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  return loadImage(url).finally(() => URL.revokeObjectURL(url))
 }
 
 function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
