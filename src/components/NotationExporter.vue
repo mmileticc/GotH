@@ -72,6 +72,31 @@ const HARMONICA_ROW_GAP = 10
 const HARMONICA_ROW_H = 32
 const OUTPUT_SCALE = 2
 
+// Glava (krug) note se iscrtava kao muzički font-glyph — <text> unutar
+// <g class="at"> (isti mehanizam kao svi ostali muzički simboli, vidi
+// napomenu na vrhu fajla o CssFontSvgCanvas), NEZAVISNO od vektorskih
+// putanja kojima alphaTab crta stem/beam/linije notnog sistema. Zato
+// font-size baš TOG <text> elementa možemo uvećati BEZ ikakvog uticaja na
+// položaj stem-a, beam-a ili bilo čega drugog — glava note vizuelno naraste
+// oko svoje baseline referentne tačke (standardno ponašanje font-size-a).
+// NOTEHEAD_SCALE je jedini broj koji treba menjati da bi se krug note
+// povećao/smanjio (1 = originalna veličina, 2 = duplo veća — probna
+// vrednost po dogovoru).
+const NOTEHEAD_SCALE = 1.1
+
+// SMuFL kodovi (Unicode code point) standardnih glava nota — vidi
+// MusicFontSymbol enum u @coderline/alphatab/dist/alphaTab.core.mjs
+// (NoteheadBlack pokriva četvrtinu i sve kraće note — osminu, šesnaestinu
+// itd. — jer sve dele istu punu/crnu glavu, samo se razlikuju po dodatim
+// "perima"/beam-ovima koji se crtaju odvojeno).
+const NOTEHEAD_CODEPOINTS = new Set<number>([
+  57504, // NoteheadDoubleWhole
+  57505, // NoteheadDoubleWholeSquare
+  57506, // NoteheadWhole
+  57507, // NoteheadHalf
+  57508, // NoteheadBlack
+])
+
 function removeAttributionText(root: HTMLElement) {
   root.querySelectorAll('text').forEach((el) => {
     if (el.textContent?.trim() === ALPHATAB_ATTRIBUTION_TEXT) el.remove()
@@ -113,6 +138,26 @@ function forceMusicFontInline(svgs: SVGSVGElement[]): Set<string> {
     })
   }
   return families
+}
+
+// Uvećava SAMO note glave (vidi napomenu uz NOTEHEAD_SCALE) — prepoznate po
+// tačno jednom Unicode karakteru koji <text> sadrži, upoređenom sa
+// NOTEHEAD_CODEPOINTS. getComputedStyle ovde vraća KONAČNU, već rešenu px
+// vrednost font-size-a (bez obzira da li je stigla kao eksplicitan % inline
+// stil ili nasleđena iz globalnog .at CSS pravila), pa je bezbedno
+// pomnožiti je i upisati nazad kao nov inline font-size.
+function enlargeNoteheads(svgs: SVGSVGElement[]): void {
+  for (const svg of svgs) {
+    svg.querySelectorAll('.at > text').forEach((el) => {
+      const text = el as SVGTextElement
+      const ch = text.textContent
+      if (!ch || ch.length !== 1) return
+      if (!NOTEHEAD_CODEPOINTS.has(ch.codePointAt(0) ?? -1)) return
+      const currentPx = parseFloat(getComputedStyle(text).fontSize)
+      if (!currentPx) return
+      text.style.setProperty('font-size', `${currentPx * NOTEHEAD_SCALE}px`)
+    })
+  }
 }
 
 // Ubacuje Bravura font kao base64 @font-face DIREKTNO u svaki <svg>, tako
@@ -304,6 +349,7 @@ async function exportPng() {
 
     await document.fonts.ready
     await embedFontIntoSvgs(svgEls)
+    enlargeNoteheads(svgEls)
 
     const containerRect = atContainer.value.getBoundingClientRect()
     const svgPositions = svgEls.map((svg) => {
