@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import * as alphaTab from '@coderline/alphatab'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildAlphaTexForExport } from '@/lib/alphaTex'
-import { tuningStringBreakdown } from '@/lib/tunings'
+import { tuningDisplayName } from '@/lib/tunings'
 import { downloadBlob } from '@/lib/exportImage'
 import type { TabNoteData } from '@/types/tab'
 
@@ -392,7 +392,7 @@ async function exportPng() {
     ctx.textAlign = 'left'
     ctx.textBaseline = 'alphabetic'
     ctx.fillText(
-      `${t('guitartabs_tuning_current')} ${tuningStringBreakdown(store.tuning)}`,
+      `${t('guitartabs_tuning_current')} ${tuningDisplayName(store.tuning)}`,
       EXPORT_PADDING,
       EXPORT_PADDING + TUNING_CAPTION_H - 6,
     )

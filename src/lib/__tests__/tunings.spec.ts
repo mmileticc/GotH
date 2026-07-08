@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { TUNING_PRESETS, CUSTOM_TUNING_ID, findPresetByTuning, isValidNoteString, tuningStringBreakdown } from '../tunings'
+import {
+  TUNING_PRESETS,
+  CUSTOM_TUNING_ID,
+  findPresetByTuning,
+  isValidNoteString,
+  tuningStringBreakdown,
+  tuningDisplayName,
+} from '../tunings'
 
 describe('tunings', () => {
   it('prepoznaje standard tuning kao preset', () => {
@@ -24,14 +31,30 @@ describe('tunings', () => {
     expect(isValidNoteString('')).toBe(false)
   })
 
-  it('ispisuje štim po žicama, numerisano od 1 (najviša žica)', () => {
+  it('ispisuje štim po žicama od 6. (najdeblje) ka 1. (najtanjoj), standardna konvencija', () => {
     const standard = TUNING_PRESETS.find((p) => p.id === 'standard')!
-    expect(tuningStringBreakdown(standard.tuning)).toBe('1=E4  2=B3  3=G3  4=D3  5=A2  6=E2')
+    expect(tuningStringBreakdown(standard.tuning)).toBe('6=E2  5=A2  4=D3  3=G3  2=B3  1=E4')
   })
 
   it('radi i za netipičan broj žica (npr. 7-žična gitara)', () => {
     expect(tuningStringBreakdown(['E4', 'B3', 'G3', 'D3', 'A2', 'D2', 'B1'])).toBe(
-      '1=E4  2=B3  3=G3  4=D3  5=A2  6=D2  7=B1',
+      '7=B1  6=D2  5=A2  4=D3  3=G3  2=B3  1=E4',
     )
+  })
+
+  it('DADGAD preset ima ispravan label (6->1 konvencija, ne redosled internog niza)', () => {
+    const dadgad = TUNING_PRESETS.find((p) => p.id === 'dadgad')!
+    expect(dadgad.label).toBe('DADGAD')
+  })
+
+  it('Open G i Open D presetovi imaju label u 6->1 konvenciji (ranije bili obrnuti)', () => {
+    const openG = TUNING_PRESETS.find((p) => p.id === 'open-g')!
+    const openD = TUNING_PRESETS.find((p) => p.id === 'open-d')!
+    expect(openG.label).toBe('Open G (D G D G B D)')
+    expect(openD.label).toBe('Open D (D A D F# A D)')
+  })
+
+  it('tuningDisplayName ispisuje custom štim okrenut u 6->1 konvenciju', () => {
+    expect(tuningDisplayName(['E4', 'B3', 'G3', 'D3', 'A2', 'F2'])).toBe('F2 A2 D3 G3 B3 E4')
   })
 })
