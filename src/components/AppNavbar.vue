@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { setStoredLocale } from '@/i18n'
 import { useDarkMode } from '@/composables/useDarkMode'
+import AppIcon from '@/components/icons/AppIcon.vue'
 
 const { locale } = useI18n()
 const route = useRoute()
@@ -42,7 +43,7 @@ function setLang(lang: 'en' | 'sr') {
             {{ $t('back_btn') }}
           </RouterLink>
           <button class="btn btn-outline-light me-2" type="button" title="Tamna/Svetla tema" @click="toggle">
-            {{ isDark ? '☀️' : '🌙' }}
+            <AppIcon :name="isDark ? 'sun' : 'moon'" :size="18" />
           </button>
           <div class="btn-group me-lg-2 w-100 w-lg-auto position-relative">
             <button

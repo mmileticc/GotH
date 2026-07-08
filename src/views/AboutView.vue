@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AppIcon from '@/components/icons/AppIcon.vue'
 
 const { t } = useI18n()
 
@@ -51,7 +52,7 @@ async function onSubmit() {
 <template>
   <div class="container mt-4" style="max-width: 860px">
     <div class="text-center mb-5">
-      <span class="about-wip-badge">{{ $t('about_badge') }}</span>
+      <span class="about-wip-badge"><AppIcon name="construction" :size="14" /> {{ $t('about_badge') }}</span>
       <h1 class="mt-3">{{ $t('about_title') }}</h1>
     </div>
 
@@ -119,7 +120,7 @@ async function onSubmit() {
               @click="setStars(n)"
               @mouseenter="hoverRating = n"
             >
-              ★
+              <AppIcon name="star" :filled="(rating !== null && n <= rating) || (hoverRating !== null && n <= hoverRating)" :size="22" />
             </button>
           </div>
         </div>
@@ -136,7 +137,8 @@ async function onSubmit() {
           ></textarea>
         </div>
 
-        <div v-if="feedback" class="mb-3" role="alert" :class="feedback.type === 'success' ? 'text-success fw-semibold' : 'text-danger fw-semibold'">
+        <div v-if="feedback" class="mb-3 d-flex align-items-center gap-2" role="alert" :class="feedback.type === 'success' ? 'text-success fw-semibold' : 'text-danger fw-semibold'">
+          <AppIcon :name="feedback.type === 'success' ? 'check' : 'x'" :size="16" />
           {{ feedback.text }}
         </div>
 

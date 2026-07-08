@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppIcon from '@/components/icons/AppIcon.vue'
+</script>
 
 <template>
   <div class="container mt-5">
@@ -17,7 +19,7 @@
         <div class="col-md-4">
           <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-              <div class="fs-1 mb-3">🎸</div>
+              <div class="mb-3 feature-icon"><AppIcon name="guitar" :size="40" /></div>
               <h5 class="card-title">{{ $t('feature_1_title') }}</h5>
               <p class="card-text text-muted">{{ $t('feature_1_desc') }}</p>
             </div>
@@ -26,7 +28,7 @@
         <div class="col-md-4">
           <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-              <div class="fs-1 mb-3">🎼</div>
+              <div class="mb-3 feature-icon"><AppIcon name="music-score" :size="40" /></div>
               <h5 class="card-title">{{ $t('feature_2_title') }}</h5>
               <p class="card-text text-muted">{{ $t('feature_2_desc') }}</p>
             </div>
@@ -35,7 +37,7 @@
         <div class="col-md-4">
           <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-              <div class="fs-1 mb-3">⚙️</div>
+              <div class="mb-3 feature-icon"><AppIcon name="settings" :size="40" /></div>
               <h5 class="card-title">{{ $t('feature_3_title') }}</h5>
               <p class="card-text text-muted">{{ $t('feature_3_desc') }}</p>
             </div>
@@ -86,3 +88,11 @@
     <small>{{ $t('footer_text') }}</small>
   </footer>
 </template>
+
+<style scoped>
+.feature-icon {
+  color: var(--mahogany-main, #6b3f3f);
+  display: flex;
+  justify-content: center;
+}
+</style>

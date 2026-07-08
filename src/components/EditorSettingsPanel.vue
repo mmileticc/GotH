@@ -13,6 +13,7 @@ import {
   buildNoteString,
 } from '@/lib/tunings'
 import type { FretTheme } from '@/types/tab'
+import AppIcon from '@/components/icons/AppIcon.vue'
 
 const store = useEditorStore()
 const open = ref(false)
@@ -97,7 +98,7 @@ function onStringOctaveChange(index: number, newOctave: number) {
 <template>
   <div id="settings">
     <button id="settingsToggle" class="btn btn-outline-secondary mb-2" type="button" @click="toggle">
-      ⚙️ {{ $t('settings_toggle_label') }}
+      <AppIcon name="settings" :size="16" /> {{ $t('settings_toggle_label') }}
     </button>
 
     <div v-show="open" id="settingsPanel" class="control-panel">
@@ -242,7 +243,10 @@ function onStringOctaveChange(index: number, newOctave: number) {
                   :checked="store.advanced"
                   @change="onAdvancedToggle"
                 />
-                <label class="form-check-label" for="advancedModeToggle">{{ $t('advanced_mode') }}</label>
+                <label class="form-check-label" for="advancedModeToggle">
+                  {{ $t('advanced_mode') }}
+                  <AppIcon name="star" :filled="true" :size="14" class="advanced-mode-star" />
+                </label>
               </div>
             </div>
           </div>
@@ -253,6 +257,12 @@ function onStringOctaveChange(index: number, newOctave: number) {
 </template>
 
 <style scoped>
+.advanced-mode-star {
+  color: #d4af37;
+  margin-left: 0.15rem;
+  vertical-align: -0.1em;
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));

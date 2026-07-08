@@ -206,13 +206,19 @@ body.dark-mode tr td {
   filter: saturate(0.9) brightness(0.95);
   position: relative;
 }
+/* SVG zvezdica (isti oblik kao AppIcon "star") umesto ★ karaktera — CSS
+   ::after ne može da renderuje Vue komponentu, pa se ista SVG putanja
+   ugrađuje kao data-URI background-image. */
 .advancedNote::after {
-  content: "★";
+  content: "";
   position: absolute;
   top: 2px;
   right: 4px;
-  font-size: 10px;
-  color: rgba(255,215,0,0.9);
+  width: 10px;
+  height: 10px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2.5l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.3l-5.8 3.1 1.1-6.47-4.7-4.58 6.5-.95L12 2.5z' fill='%23ffd700' fill-opacity='0.9'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .disabledNote {
@@ -375,7 +381,7 @@ body.dark-mode .zeroFret {
   grid-template-columns: repeat(auto-fill, 50px); /* napravi redove dok ima mesta */
   justify-content: center;
   gap: 5px;
-  
+
 
 
 
@@ -570,8 +576,8 @@ body.dark-mode #harmonicaKey optgroup[label="Najčešći"] {
 .mahogany-circle {
   background: linear-gradient(135deg, #4b2e2e, #6b3f3f);
   color: #fff !important;
-  width: 60px; 
-  height: 60px; 
+  width: 60px;
+  height: 60px;
   font-size: 24px;
   font-weight: 700;
   font-family: 'Inter', sans-serif;
@@ -586,7 +592,7 @@ body.dark-mode #harmonicaKey optgroup[label="Najčešći"] {
 .mahogany-bg {
   background-color: var(--mahogany-main) !important;
   color: #fff !important;
-  
+
 }
 
 /* Tablet and larger screens */
@@ -980,5 +986,3 @@ body.dark-mode .dropdown-item:focus {
   background-color: #3a3a3a;
   color: #fff;
 }
-
-

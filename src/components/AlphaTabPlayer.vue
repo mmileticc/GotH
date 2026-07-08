@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import * as alphaTab from '@coderline/alphatab'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildAlphaTex } from '@/lib/alphaTex'
+import AppIcon from '@/components/icons/AppIcon.vue'
 
 const { t } = useI18n()
 
@@ -195,10 +196,11 @@ function onStop() {
         :disabled="!isReady"
         @click="onPlayPause"
       >
+        <AppIcon :name="isPlaying ? 'pause' : 'play'" :size="15" />
         {{ isPlaying ? $t('alphatab_pause') : $t('alphatab_play') }}
       </button>
       <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="!isReady" @click="onStop">
-        {{ $t('alphatab_stop') }}
+        <AppIcon name="stop" :size="15" /> {{ $t('alphatab_stop') }}
       </button>
 
       <div class="btn-group btn-group-sm ms-1" role="group" :aria-label="t('alphatab_track_aria')">
@@ -208,7 +210,7 @@ function onStop() {
           :class="playbackTrack === 'guitar' ? 'btn-secondary' : 'btn-outline-secondary'"
           @click="playbackTrack = 'guitar'"
         >
-          {{ $t('alphatab_track_guitar') }}
+          <AppIcon name="guitar" :size="15" /> {{ $t('alphatab_track_guitar') }}
         </button>
         <button
           type="button"
@@ -216,7 +218,7 @@ function onStop() {
           :class="playbackTrack === 'harmonica' ? 'btn-secondary' : 'btn-outline-secondary'"
           @click="playbackTrack = 'harmonica'"
         >
-          {{ $t('alphatab_track_harmonica') }}
+          <AppIcon name="harmonica" :size="15" /> {{ $t('alphatab_track_harmonica') }}
         </button>
       </div>
 

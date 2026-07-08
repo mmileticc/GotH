@@ -11,6 +11,7 @@ import ClearConfirmModal from '@/components/ClearConfirmModal.vue'
 import LegendModal from '@/components/LegendModal.vue'
 import SaveExportModal from '@/components/SaveExportModal.vue'
 import { tuningDisplayName } from '@/lib/tunings'
+import AppIcon from '@/components/icons/AppIcon.vue'
 import type { NoteDuration } from '@/types/tab'
 
 const store = useEditorStore()
@@ -114,7 +115,7 @@ function setDuration(d: NoteDuration) {
                 :disabled="!store.canUndo"
                 @click="store.undo()"
               >
-                ↶ {{ $t('undo_button') }}
+                <AppIcon name="undo" :size="15" /> {{ $t('undo_button') }}
               </button>
               <button
                 class="btn btn-sm btn-outline-secondary"
@@ -122,7 +123,7 @@ function setDuration(d: NoteDuration) {
                 :disabled="!store.canRedo"
                 @click="store.redo()"
               >
-                ↷ {{ $t('redo_button') }}
+                <AppIcon name="redo" :size="15" /> {{ $t('redo_button') }}
               </button>
             </div>
 
