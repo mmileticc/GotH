@@ -70,7 +70,12 @@ export function useTabEditingKeyboard() {
 
   function onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement | null
-    if (!target?.closest('.tab-note')) {
+    // '.alphatab-surface' — notni zapis (alphaTab) iscrtava sopstveni SVG DOM
+    // mimo naše '.tab-note' oznake; klik na notu tamo (vidi beatMouseDown u
+    // AlphaTabPlayer.vue) selektuje notu preko store-a, ali bi bez ovog
+    // izuzetka ovaj isti (bubblovani) klik odmah posle toga bio protumačen
+    // kao "klik van note" i poništio bi selekciju.
+    if (!target?.closest('.tab-note') && !target?.closest('.alphatab-surface') ) {
       store.selectByPosition(null)
       inputBuffer.value = ''
     }

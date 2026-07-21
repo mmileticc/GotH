@@ -69,28 +69,52 @@ const tracks = shallowRef<alphaTab.model.Track[]>([])
 const playbackTrack = ref<'guitar' | 'harmonica'>('harmonica')
 
 // Mapira alphaTab Beat objekte (iz OBE trake) nazad na poziciju note u
-// store.notes, za sinhronizovano markiranje trenutno svirane note u
-// Fretboard/GuitarTabView/HarmonicaTabView tokom reprodukcije. alphaTex.ts
-// generiše tačno jedan beat po noti, istim redosledom kao store.notes, pa je
-// redni broj beat-a (kroz sve taktove trake, po redu) == note.position.
+// store.notes, za sinhronizovano markiranje trenutno svirane/selektovane note
+// u Fretboard/GuitarTabView/HarmonicaTabView (i obrnuto, vidi positionToBeat
+// ispod). alphaTex.ts generiše tačno jedan beat po noti po traci, istim
+// redosledom kao store.notes, pa je redni broj beat-a (kroz sve taktove
+// trake, po redu) == note.position.
 let beatIndexMap = new Map<alphaTab.model.Beat, number>()
+// Obrnuta mapa: pozicija note -> jedan reprezentativni Beat za tu poziciju.
+// Koristi se da pri selekciji note (klik u gitarskim/harmonika tabovima)
+// pomerimo alphaTab-ov reprodukcioni kursor na tu notu u notnom zapisu — vidi
+// updateCursorForSelection.
+let positionToBeat = new Map<number, alphaTab.model.Beat>()
 
-function buildBeatIndexMap(scoreTracks: alphaTab.model.Track[]): Map<alphaTab.model.Beat, number> {
-  const map = new Map<alphaTab.model.Beat, number>()
+function buildBeatIndexMap(scoreTracks: alphaTab.model.Track[]): {
+  toPosition: Map<alphaTab.model.Beat, number>
+  toBeat: Map<number, alphaTab.model.Beat>
+} {
+  const toPosition = new Map<alphaTab.model.Beat, number>()
+  const toBeat = new Map<number, alphaTab.model.Beat>()
   for (const track of scoreTracks) {
     let idx = 0
     for (const staff of track.staves) {
       for (const bar of staff.bars) {
         for (const voice of bar.voices) {
           for (const beat of voice.beats) {
-            map.set(beat, idx)
+            toPosition.set(beat, idx)
+            if (!toBeat.has(idx)) toBeat.set(idx, beat)
             idx++
           }
         }
       }
     }
   }
-  return map
+  return { toPosition, toBeat }
+}
+
+// Pomera alphaTab-ov reprodukcioni kursor (isti onaj koji se pomera tokom
+// puštanja muzike, .at-cursor-beat/.at-cursor-bar) na notu koja odgovara
+// trenutno selektovanoj poziciji — NE pokreće reprodukciju, samo postavlja
+// kursor da "sedi" na toj noti u notnom zapisu, kao vizuelna potvrda selekcije.
+function updateCursorForSelection() {
+  if (!api.value) return
+  const pos = store.selectedIndex
+  const beat = pos !== null ? positionToBeat.get(pos) : undefined
+  if (beat) {
+    api.value.tickPosition = beat.absolutePlaybackStart
+  }
 }
 
 function currentTex(): string {
@@ -147,12 +171,24 @@ onMounted(() => {
   })
   instance.scoreLoaded.on((score) => {
     tracks.value = score.tracks
-    beatIndexMap = buildBeatIndexMap(score.tracks)
+    const maps = buildBeatIndexMap(score.tracks)
+    beatIndexMap = maps.toPosition
+    positionToBeat = maps.toBeat
     applyTrackSelection()
+    // Note se regenerišu (novi Beat objekti) posle svake izmene, pa kursor
+    // za trenutno selektovanu poziciju treba ponovo postaviti na novom render-u.
+    updateCursorForSelection()
   })
   // Prati alphaTab-ov ugrađeni kursor tokom reprodukcije i markira odgovarajuću
   // notu u našim sopstvenim komponentama (isti mehanizam kao ručni klik na notu).
   instance.playedBeatChanged.on((beat) => {
+    const position = beatIndexMap.get(beat)
+    if (position !== undefined) store.selectByPosition(position)
+  })
+  // Klik na notu u notnom zapisu selektuje odgovarajuću notu u editoru (isto
+  // kao klik u gitarskim/harmonika tabovima) — omogućava izmenu/brisanje note
+  // direktno preko fretboard-a nakon klika na notaciju.
+  instance.beatMouseDown.on((beat) => {
     const position = beatIndexMap.get(beat)
     if (position !== undefined) store.selectByPosition(position)
   })
@@ -176,6 +212,11 @@ watch(
 )
 
 watch(playbackTrack, () => applyTrackSelection())
+
+// Klik na notu u gitarskim/harmonika tabovima (ili bilo gde drugde preko
+// store.selectByPosition) menja store.selectedIndex — ovde se to prevodi u
+// pomeranje reprodukcionog kursora na odgovarajuću notu u notnom zapisu.
+watch(() => store.selectedIndex, () => updateCursorForSelection())
 
 function onPlayPause() {
   api.value?.playPause()
@@ -256,7 +297,8 @@ function onStop() {
 }
 
 .alphatab-surface :deep(.at-selection div) {
-  background: rgba(64, 64, 255, 0.1);
+  background: rgba(64, 64, 255, 0.22);
+  border-radius: 3px;
 }
 
 .alphatab-surface :deep(.at-highlight) * {
