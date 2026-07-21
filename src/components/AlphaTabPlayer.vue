@@ -165,6 +165,13 @@ onMounted(() => {
   })
   instance.playerReady.on(() => {
     isReady.value = true
+    // playerReady se okida (i ponovo, na svaki reload) tek kad je pesma
+    // učitana u player KAO MIDI — deo tog učitavanja interno resetuje
+    // reprodukcionu poziciju na početak. Zato se kursor za trenutno
+    // selektovanu notu mora postaviti OVDE, a ne u scoreLoaded (koji se
+    // okida ranije, pre tog internog reseta, pa bi nam postavljanje tamo
+    // odmah bilo pregaženo — otud bug da kursor "skoči" na prvu notu).
+    updateCursorForSelection()
   })
   instance.playerStateChanged.on((args) => {
     isPlaying.value = args.state === alphaTab.synth.PlayerState.Playing
@@ -175,9 +182,6 @@ onMounted(() => {
     beatIndexMap = maps.toPosition
     positionToBeat = maps.toBeat
     applyTrackSelection()
-    // Note se regenerišu (novi Beat objekti) posle svake izmene, pa kursor
-    // za trenutno selektovanu poziciju treba ponovo postaviti na novom render-u.
-    updateCursorForSelection()
   })
   // Prati alphaTab-ov ugrađeni kursor tokom reprodukcije i markira odgovarajuću
   // notu u našim sopstvenim komponentama (isti mehanizam kao ručni klik na notu).

@@ -75,7 +75,13 @@ export function useTabEditingKeyboard() {
     // AlphaTabPlayer.vue) selektuje notu preko store-a, ali bi bez ovog
     // izuzetka ovaj isti (bubblovani) klik odmah posle toga bio protumačen
     // kao "klik van note" i poništio bi selekciju.
-    if (!target?.closest('.tab-note') && !target?.closest('.alphatab-surface') ) {
+    // '#tabControls' — editorski toolbar (mode edit/insert, delete/clear,
+    // undo/redo, trajanje note) — klik na te kontrole ne sme da deselektuje
+    // notu koju upravo ta kontrola treba da izmeni.
+    const isInsideNote = target?.closest('.tab-note')
+    const isInsideNotation = target?.closest('.alphatab-surface')
+    const isInsideToolbar = target?.closest('#tabControls')
+    if (!isInsideNote && !isInsideNotation && !isInsideToolbar) {
       store.selectByPosition(null)
       inputBuffer.value = ''
     }
