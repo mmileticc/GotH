@@ -4,6 +4,9 @@ import BaseModal from './BaseModal.vue'
 import NotationExporter from './NotationExporter.vue'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildExportText, downloadText, type ExportType } from '@/lib/exportText'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const store = useEditorStore()
 const open = defineModel<boolean>({ default: false })
@@ -13,6 +16,7 @@ const exporter = ref<InstanceType<typeof NotationExporter> | null>(null)
 function save(type: ExportType) {
   const text = buildExportText(store.notes, store.tuning, store.harmonica, type)
   downloadText(text, type === 'harmonica-only' ? 'harmonicaTabs.txt' : 'guitarTabs.txt')
+  if (posthogConfigured) posthog.capture('tab_exported', { export_type: type, note_count: store.notes.length })
   open.value = false
 }
 

@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import BaseModal from './BaseModal.vue'
 import { useEditorStore } from '@/stores/editorStore'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const store = useEditorStore()
 const open = defineModel<boolean>({ default: false })
 
 function confirm() {
+  const cleared_note_count = store.notes.length
   store.clearAll()
+  if (posthogConfigured) posthog.capture('tab_cleared', { cleared_note_count })
   open.value = false
 }
 </script>

@@ -3,6 +3,9 @@ import { ref } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useEditorStore } from '@/stores/editorStore'
 import { parseGuitarTab } from '@/lib/tabParser'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const store = useEditorStore()
 const open = defineModel<boolean>({ default: false })
@@ -13,6 +16,7 @@ function confirm() {
   try {
     const parsed = parseGuitarTab(text.value, store.tuning, store.noteSystem)
     store.loadParsedNotes(parsed)
+    if (posthogConfigured) posthog.capture('tab_notes_imported', { note_count: parsed.length })
     error.value = ''
     open.value = false
   } catch (e) {

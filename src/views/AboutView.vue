@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppIcon from '@/components/icons/AppIcon.vue'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const { t } = useI18n()
 
@@ -36,6 +39,7 @@ async function onSubmit() {
       headers: { Accept: 'application/json' },
     })
     if (!res.ok) throw new Error('server error')
+    if (posthogConfigured) posthog.capture('feedback_submitted', { rating: rating.value ?? undefined })
     feedback.value = { type: 'success', text: t('about_form_success') }
     name.value = ''
     email.value = ''

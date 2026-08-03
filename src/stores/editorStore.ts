@@ -4,6 +4,9 @@ import type { EditMode, FretTheme, NotationPreference, NoteDuration, TabNoteData
 import { DiatonicHarmonica } from '@/lib/harmonica'
 import { NoteSystem } from '@/lib/noteSystem'
 import { idbGet, idbSet } from '@/lib/db'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const DEFAULT_TUNING = ['E4', 'B3', 'G3', 'D3', 'A2', 'E2']
 const MAX_HISTORY = 50
@@ -199,6 +202,7 @@ export const useEditorStore = defineStore('editor', () => {
     const tabNote: TabNoteData = { string, fret, position, note, duration }
     notes.value.splice(position, 0, tabNote)
     reindex()
+    if (posthogConfigured) posthog.capture('tab_note_added', { duration, insert_mode: mode.value })
   }
 
   function deleteNote(position: number) {
