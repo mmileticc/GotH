@@ -7,6 +7,9 @@ import { buildAlphaTexForExport } from '@/lib/alphaTex'
 import { tuningDisplayName } from '@/lib/tunings'
 import { downloadBlob } from '@/lib/exportImage'
 import type { TabNoteData } from '@/types/tab'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 // Ova komponenta se ne prikazuje korisniku direktno (renderuje se van
 // vidljivog ekrana) — njena jedina svrha je da na zahtev (exportPng())
@@ -432,6 +435,7 @@ async function exportPng() {
     if (!blob) throw new Error('canvas.toBlob failed')
 
     downloadBlob(blob, 'goth-notacija.png')
+    if (posthogConfigured) posthog.capture('notation_exported_png', { note_count: sortedNotes.length })
   } catch (e) {
     exportError.value = e instanceof Error ? e.message : String(e)
   } finally {

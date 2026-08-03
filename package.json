@@ -11,12 +11,13 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "vue": "^3.5.0",
-    "vue-router": "^4.4.0",
-    "pinia": "^2.2.0",
-    "vue-i18n": "^11.0.0",
+    "@coderline/alphatab": "^1.8.0",
     "idb": "^8.0.0",
-    "@coderline/alphatab": "^1.8.0"
+    "pinia": "^2.2.0",
+    "posthog-js": "^1.409.6",
+    "vue": "^3.5.0",
+    "vue-i18n": "^11.0.0",
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
     "@coderline/alphatab-vite": "^1.8.0",

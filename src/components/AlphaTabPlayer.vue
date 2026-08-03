@@ -5,6 +5,9 @@ import * as alphaTab from '@coderline/alphatab'
 import { useEditorStore } from '@/stores/editorStore'
 import { buildAlphaTex } from '@/lib/alphaTex'
 import AppIcon from '@/components/icons/AppIcon.vue'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
 
 const { t } = useI18n()
 
@@ -223,6 +226,9 @@ watch(playbackTrack, () => applyTrackSelection())
 watch(() => store.selectedIndex, () => updateCursorForSelection())
 
 function onPlayPause() {
+  if (!isPlaying.value && posthogConfigured) {
+    posthog.capture('notation_playback_started', { playback_track: playbackTrack.value, note_count: store.notes.length })
+  }
   api.value?.playPause()
 }
 

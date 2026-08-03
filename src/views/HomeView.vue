@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import AppIcon from '@/components/icons/AppIcon.vue'
+import posthog from 'posthog-js'
+
+const posthogConfigured = Boolean(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN && import.meta.env.VITE_POSTHOG_HOST)
+
+function startEditor() {
+  if (posthogConfigured) posthog.capture('editor_started')
+}
 </script>
 
 <template>
@@ -9,7 +16,7 @@ import AppIcon from '@/components/icons/AppIcon.vue'
       <h1 class="display-4 fw-bold mb-3">{{ $t('hero_h1') }}</h1>
       <p class="lead fs-5 mb-4">{{ $t('hero_subtitle') }}</p>
       <p class="text-muted fs-6 mb-4">{{ $t('hero_desc') }}</p>
-      <RouterLink to="/editor" class="btn btn-lg btn-theme btn-mahogany">{{ $t('editor_btn') }}</RouterLink>
+      <RouterLink to="/editor" class="btn btn-lg btn-theme btn-mahogany" @click="startEditor">{{ $t('editor_btn') }}</RouterLink>
     </section>
 
     <!-- Features section -->
@@ -80,7 +87,7 @@ import AppIcon from '@/components/icons/AppIcon.vue'
     >
       <h2 class="mb-3" style="color: white">{{ $t('cta_title') }}</h2>
       <p class="fs-5 mb-4">{{ $t('cta_desc') }}</p>
-      <RouterLink to="/editor" class="btn btn-light btn-lg">{{ $t('editor_btn') }}</RouterLink>
+      <RouterLink to="/editor" class="btn btn-light btn-lg" @click="startEditor">{{ $t('editor_btn') }}</RouterLink>
     </section>
   </div>
 
